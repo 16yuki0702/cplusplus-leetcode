@@ -559,3 +559,276 @@ public:
         return st.empty();
     }
 };
+
+// 21. Merge Two Sorted Lists
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        ListNode *current = new ListNode(-1, nullptr);
+        ListNode *dummy = current;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                current->next = l1;
+                l1 = l1->next;
+            } else {
+                current->next = l2;
+                l2 = l2->next;
+            }
+            current = current->next;
+        }
+        while (l1) {
+            current->next = l1;
+            current = current->next;
+            l1 = l1->next;
+        }
+        while (l2) {
+            current->next = l2;
+            current = current->next;
+            l2 = l2->next;
+        }
+        return dummy->next;
+    }
+};
+
+// 22. Generate Parentheses
+class Solution {
+public:
+    vector<string> backTrack(string s, int toOpen, int toClose) {
+        vector<string> res;
+        if (toOpen == 0 && toClose == 0) {
+            return {s};
+        }
+        if (toOpen > 0) {
+            vector<string> b = backTrack(s + "(", toOpen - 1, toClose + 1);
+            res.insert(res.end(), b.begin(), b.end());
+        }
+        if (toClose > 0) {
+            vector<string> b = backTrack(s + ")", toOpen, toClose - 1);
+            res.insert(res.end(), b.begin(), b.end());
+        }
+        return res;
+    }
+    vector<string> generateParenthesis(int n) {
+        return backTrack("", n, 0);
+    }
+};
+
+// 23. Merge k Sorted Lists
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        ListNode *dummy = new ListNode(-1, nullptr), *c = dummy;
+        int min = INT_MAX, p = 0;
+        while (true) {
+            for (int i = 0; i < lists.size(); i++) {
+                if (lists[i] && lists[i]->val < min) {
+                    min = lists[i]->val;
+                    p = i;
+                }
+            }
+            if (min == INT_MAX) {
+                break;
+            }
+            c->next = lists[p];
+            c = c->next;
+            lists[p] = lists[p]->next;
+            min = INT_MAX;
+        }
+        return dummy->next;
+    }
+};
+
+// 24. Swap Nodes in Pairs
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) {
+            return head;
+        }
+        ListNode *res = head->next;
+        head->next = swapPairs(head->next->next);
+        res->next = head;
+        return res;
+    }
+};
+
+// 25. Reverse Nodes in k-Group
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    int listLen(ListNode *n) {
+        int res = 0;
+        while (n) {
+            res++;
+            n = n->next;
+        }
+        return res;
+    }
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode *dummy = new ListNode(-1, nullptr), *prev = dummy;
+        dummy->next = head;
+        int len = listLen(head);
+        for (int i = 0; i < len / k; i++) {
+            for (int j = 1; j < k; j++) {
+                ListNode *tmp = prev->next;
+                prev->next = head->next;
+                head->next = head->next->next;
+                prev->next->next = tmp;
+            }
+            prev = head;
+            head = head->next;
+        }
+        return dummy->next;
+    }
+};
+
+// 26. Remove Duplicates from Sorted Array
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() == 0) {
+            return 0;
+        }
+        int prev = nums[0], res = 1;
+        for (int i = 1; i < nums.size(); i++) {
+            if (prev != nums[i]) {
+                nums[res++] = nums[i], prev = nums[i];
+            }
+        }
+        return res;
+    }
+};
+
+// 27. Remove Element
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        if (nums.size() == 0) {
+            return 0;
+        }
+        int res = 0, p = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] != val) {
+                nums[p] = nums[i];
+                p++, res++;
+            }
+        }
+        return res;
+    }
+};
+
+// 28. Implement strStr()
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        if (needle.length() == 0) {
+            return 0;
+        }
+        for (int i = 0; i <= int(haystack.length() - needle.length()); i++) {
+            int j = i, k = 0;
+            while (k < needle.length() && haystack[j] == needle[k]) {
+                k++, j++;
+            }
+            if (k == needle.length()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+};
+
+// 29. Divide Two Integers
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if (dividend == INT_MIN && divisor == -1) {
+            return INT_MAX;
+        }
+        long dvd = labs(dividend), dvs = labs(divisor), res = 0;
+        int sign = dividend > 0 ^ divisor > 0 ? -1 : 1;
+        while (dvd >= dvs) {
+            long tmp = dvs, m = 1;
+            while (tmp << 1 <= dvd) {
+                tmp <<= 1;
+                m <<= 1;
+            }
+            dvd -= tmp;
+            res += m;
+        }
+        return sign * res;
+    }
+};
+
+// 30. Substring with Concatenation of All Words
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        if (words.size() == 0 || s.length() == 0) {
+            return {};
+        }
+        unordered_map<string, int> m;
+        for (int i = 0; i < words.size(); i++) {
+            m[words[i]]++;
+        }
+        int wordLen = words[0].length();
+        vector<int> res;
+        for (int i = 0; i < int(s.length() - (words.size() * wordLen)) + 1; i++) {
+            unordered_map<string, int>tmp;
+            int j = 0;
+            for (j = 0; j < words.size(); j++) {
+                string str = s.substr(i + j * wordLen, wordLen);
+                if (m.find(str) != m.end()) {
+                    tmp[str]++;
+                    if (tmp[str] > m[str]) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (j == words.size()) {
+                res.push_back(i);
+            }
+        }
+        return res;
+    }
+};
