@@ -745,11 +745,11 @@ public:
         if (nums.size() == 0) {
             return 0;
         }
-        int res = 0, p = 0;
+        int res = 0;
         for (int i = 0; i < nums.size(); i++) {
             if (nums[i] != val) {
-                nums[p] = nums[i];
-                p++, res++;
+                nums[res] = nums[i];
+                res++;
             }
         }
         return res;
@@ -830,5 +830,52 @@ public:
             }
         }
         return res;
+    }
+};
+
+// 31. Next Permutation
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int i, j;
+        for (i = nums.size() - 2; i >= 0; i--) {
+            if (nums[i] < nums[i + 1]) {
+                break;
+            }
+        }
+        if (i < 0) {
+            reverse(nums.begin(), nums.end());
+        } else {
+            for (j = nums.size() - 1; j > i; j--) {
+                if (nums[j] > nums[i]) {
+                    break;
+                }
+            }
+            swap(nums[i], nums[j]);
+            reverse(nums.begin() + i + 1, nums.end());
+        }
+    }
+};
+
+// 32. Longest Valid Parentheses
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        stack<int> stack;
+        int m = 0;
+        stack.push(-1);
+        for (int i = 0; i < s.length(); i++) {
+            if (s[i] == '(') {
+                stack.push(i);
+            } else {
+                stack.pop();
+                if (stack.empty()) {
+                    stack.push(i);
+                } else {
+                    m = max(m, (i - stack.top()));
+                }
+            }
+        }
+        return m;
     }
 };
