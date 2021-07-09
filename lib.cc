@@ -879,3 +879,32 @@ public:
         return m;
     }
 };
+
+// 33. Search in Rotated Sorted Array
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size() - 1;
+        while (left <= right) {
+            if (nums[left] == target) {
+                return left;
+            } else if (nums[right] == target) {
+                return right;
+            }
+            int m = (left + right) / 2;
+            if (nums[m] == target) {
+                return m;
+            }
+            if (nums[left] > nums[right]) {
+                left++, right--;
+            } else {
+                if (nums[m] > target) {
+                    right = m - 1, left++;
+                } else {
+                    left = m + 1, right--;
+                }
+            }
+        }
+        return -1;
+    }
+};
