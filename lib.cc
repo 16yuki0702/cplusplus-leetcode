@@ -976,3 +976,166 @@ public:
         return true;
     }
 };
+
+// 37. Sudoku Solver
+class Solution {
+public:
+    void solveSudoku(vector<vector<char>>& board) {
+        solve(board, 0, 0);
+    }
+
+    bool solve(vector<vector<char>>& board, int row, int col) {
+        if (9 == row) {
+            return true;
+        }
+        int n_row, n_col;
+        if (9 == col + 1) {
+            n_row = row + 1, n_col = 0;
+        } else {
+            n_row = row, n_col = col + 1;
+        }
+        if (board[row][col] != '.') {
+            return solve(board, n_row, n_col);
+        }
+        char cs[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        for (int i = 0; i < 9; i++) {
+            if (in_cell(board, row, col, cs[i]) || in_row(board, row, cs[i]) || in_col(board, col, cs[i])) {
+                continue;
+            }
+            board[row][col] = cs[i];
+            if (solve(board, n_row, n_col)) {
+                return true;
+            }
+        }
+        board[row][col] = '.';
+        return false;
+    }
+
+    bool in_cell(vector<vector<char>>& board, int row, int col, char e) {
+        int r = row / 3, c = col / 3;
+        for (int i = 0; i < 9; i++) {
+            if (board[3 * r + i / 3][3 * c + i % 3] == e) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool in_row(vector<vector<char>>& board, int row, char e) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == e) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool in_col(vector<vector<char>>& board, int col, char e) {
+        for (int i = 0; i < 9; i++) {
+            if (board[i][col] == e) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 38. Count and Say
+class Solution {
+public:
+    string countAndSay(int n) {
+        if (n == 1) {
+            return "1";
+        } else if (n == 2) {
+            return "11";
+        }
+        string res = "11";
+        for (int i = 3; i <= n; i++) {
+            string tmp = "";
+            res = res + ' ';
+            int c = 1;
+            for (int j = 1; j < res.length(); j++) {
+                if (res[j] == res[j - 1]) {
+                    c++;
+                } else {
+                    tmp += to_string(c);
+                    tmp += res[j - 1];
+                    c = 1;
+                }
+            }
+            res = tmp;
+        }
+        return res;
+    }
+};
+
+// 39. Combination Sum
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        vector<int> sub;
+        backTrack(res, sub, candidates, 0, target, 0);
+        return res;
+    }
+
+    void backTrack(vector<vector<int>>& res, vector<int> subset, vector<int>& candidates, int sum, int target, int start_idx) {
+        if (sum == target) {
+            res.push_back(subset);
+            return;
+        } else if (sum > target) {
+            return;
+        }
+        for (int i = start_idx; i < candidates.size(); i++) {
+            vector<int> sub;
+            copy(subset.begin(), subset.end(), back_inserter(sub));
+            sub.push_back(candidates[i]);
+            backTrack(res, sub, candidates, sum + candidates[i], target, i);
+        }
+    }
+};
+
+// 40. Combination Sum II
+class Solution {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        vector<int> sub;
+        quickSort(candidates, 0, candidates.size() - 1);
+        backTrack(res, candidates, sub, target, 0, 0);
+        return res;
+    }
+    void backTrack(vector<vector<int>>& res, vector<int>& can, vector<int> sub, int target, int sum, int start_idx) {
+        if (sum == target) {
+            res.push_back(sub);
+            return;
+        } else if (sum > target) {
+            return;
+        }
+        for (int i = start_idx; i < can.size(); i++) {
+            if (i > start_idx && can[i] == can[i - 1]) {
+                continue;
+            }
+            vector<int> s;
+            copy(sub.begin(), sub.end(), back_inserter(s));
+            s.push_back(can[i]);
+            backTrack(res, can, s, target, can[i] + sum, i+1);
+        }
+    }
+    void quickSort(vector<int>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(v[(left + right) / 2], v[right]);
+        for (int i = left; i < right; i++) {
+            if (v[i] < v[right]) {
+                swap(v[p], v[i]);
+                p++;
+            }
+        }
+        swap(v[p], v[right]);
+        quickSort(v, left, p - 1);
+        quickSort(v, p + 1, right);
+    }
+};
