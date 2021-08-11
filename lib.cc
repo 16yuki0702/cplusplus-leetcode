@@ -1139,3 +1139,228 @@ public:
         quickSort(v, p + 1, right);
     }
 };
+
+// 41. First Missing Positive
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        unordered_map<int, int> m;
+        for (int i = 0; i < nums.size(); i++) {
+            m[nums[i]]++;
+        }
+        for (int i = 1; i <= nums.size() + 1; i++) {
+            if (m[i] == 0) {
+                return i;
+            }
+        }
+        return 1;
+    }
+};
+
+// 42. Trapping Rain Water
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int l = 0, r = height.size() - 1, h = 0, res = 0;
+        while (l < r) {
+            int low = height[height[l] < height[r] ? l++ : r--];
+            h = max(h, low);
+            res += h - low;
+        }
+        return res;
+    }
+};
+
+// 43. Multiply Strings
+class Solution {
+public:
+    string multiply(string num1, string num2) {
+        int n = num1.size(), m = num2.size();
+        string s(n + m, '0');
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = m - 1; j >= 0; j--) {
+                int p = (num1[i] - '0') * (num2[j] - '0') + (s[i + j + 1] - '0');
+                s[i + j + 1] = p % 10 + '0';
+                s[i + j] += p / 10;
+            }
+        }
+        for (int i = 0; i < m + n; i++) {
+            if (s[i] != '0') {
+                return s.substr(i);
+            }
+        }
+        return "0";
+    }
+};
+
+// 44. Wildcard Matching
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m = s.length(), n = p.length();
+        int i = 0, j = 0, ast = -1, match;
+        while (i < m) {
+            if (j < n && p[j] == '*') {
+                match = i, ast = j++;
+            } else if (j < n && (s[i] == p[j] || p[j] == '?')) {
+                i++, j++;
+            } else if (ast >= 0) {
+                i = ++match, j = ast + 1;
+            } else {
+                return false;
+            }
+        }
+        while (j < n && p[j] == '*') {
+            j++;
+        }
+        return j == n;
+    }
+};
+
+// 45. Jump Game II
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int step = 0, cur = 0, des = 0;
+        for (int i = 0; i < nums.size() - 1; i++) {
+            des = max(des, i + nums[i]);
+            if (cur == i) {
+                step++, cur = des;
+            }
+        }
+        return step;
+    }
+};
+
+// 46. Permutations
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> sub;
+        backTrack(res, nums, sub);
+        return res;
+    }
+    void backTrack(vector<vector<int>>& res, vector<int> nums, vector<int> sub) {
+        if (nums.size() == 0) {
+            res.push_back(sub);
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            vector<int> n, s;
+            copy(nums.begin(), nums.end(), back_inserter(n));
+            copy(sub.begin(), sub.end(), back_inserter(s));
+            n.erase(n.begin() + i);
+            s.push_back(nums[i]);
+            backTrack(res, n, s);
+        }
+    }
+};
+
+// 47. Permutations II
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        quickSort(nums, 0, nums.size() - 1);
+        do {
+            res.push_back(nums);
+        } while(nextPerm(nums));
+        return res;
+    }
+    bool nextPerm(vector<int>& nums) {
+        int n = nums.size(), i, j;
+        for (i = n - 2; i >= 0; i--) {
+            if (nums[i + 1] > nums[i]) {
+                break;
+            }
+        }
+        if (i < 0) {
+            reverse(nums.begin(), nums.end());
+            return false;
+        } else {
+            for (j = n - 1; j > i; j--) {
+                if (nums[j] > nums[i]) {
+                    break;
+                }
+            }
+            swap(nums[i], nums[j]);
+            reverse(nums.begin() + i + 1, nums.end());
+            return true;
+        }
+    }
+    void quickSort(vector<int>& n, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(n[(left + right) / 2], n[right]);
+        for (int i = left; i < right; i++) {
+            if (n[i] < n[right]) {
+                swap(n[i], n[p]), p++;
+            }
+        }
+        swap(n[p], n[right]);
+        quickSort(n, left, p - 1);
+        quickSort(n, p + 1, right);
+    }
+};
+
+// 48. Rotate Image
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        for (int i = 0, j = matrix.size() - 1; i < matrix.size() / 2; i++, j--) {
+            swap(matrix[i], matrix[j]);
+        }
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = i + 1; j < matrix.size(); j++) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+    }
+};
+
+// 49. Group Anagrams
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, int> m;
+        vector<vector<string>> res;
+        for (string s: strs) {
+            string t = s;
+            sort(t.begin(), t.end());
+            if (m.find(t) != m.end()) {
+                res[m[t]].push_back(s);
+            } else {
+                m[t] = res.size();
+                res.push_back({s});
+            }
+        }
+        return res;
+    }
+};
+
+// 50. Pow(x, n)
+class Solution {
+public:
+    double myPow(double x, int n) {
+        long nn = n;
+        if (nn == 0) {
+            return 1.0;
+        }
+        if (nn < 0) {
+            x = 1 / x, nn = -nn;
+        }
+        return pow(x, 1.0, nn);
+    }
+    double pow(double x, double res, long n) {
+        if (n == 0) {
+            return res;
+        }
+        if (n & 1 == 1) {
+            res *= x;
+        }
+        return pow(x * x, res, n >> 1);
+    }
+};
