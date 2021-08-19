@@ -1364,3 +1364,310 @@ public:
         return pow(x * x, res, n >> 1);
     }
 };
+
+// 51. N-Queens
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> res;
+        vector<vector<char>> board(n, vector<char>(n, '.'));
+        vector<bool> cols(n, false);
+        backTrack(res, board, cols, 0, n);
+        return res;
+    }
+    void backTrack(vector<vector<string>>& res, vector<vector<char>>& board, vector<bool>& cols, int r, int n) {
+        if (r == n) {
+            vector<string> tmp;
+            for (vector<char> b: board) {
+                tmp.push_back(string(b.begin(), b.end()));
+            }
+            res.push_back(tmp);
+            return;
+        }
+        for (int c = 0; c < n; c++) {
+            if (cols[c] || hasDiagonal(board, r, c, n)) {
+                continue;
+            }
+            cols[c] = true, board[r][c] = 'Q';
+            backTrack(res, board, cols, r + 1, n);
+            cols[c] = false, board[r][c] = '.';
+        }
+    }
+    bool hasDiagonal(vector<vector<char>>& board, int r, int c, int n) {
+        for (int i = r, j = c; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 'Q') {
+                return true;
+            }
+        }
+        for (int i = r, j = c; i >= 0 && j < n; i--, j++) {
+            if (board[i][j] == 'Q') {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 52. N-Queens II
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int res = 0;
+        vector<vector<char>> board(n, vector<char>(n, '.'));
+        vector<bool> cols(n, false);
+        backTrack(board, cols, res, 0, n);
+        return res;
+    }
+    void backTrack(vector<vector<char>>& board, vector<bool>& cols, int& res, int r, int n) {
+        if (r == n) {
+            res++;
+            return;
+        }
+        for (int c = 0; c < n; c++) {
+            if (cols[c] || hasDiagonal(board, r, c, n)) {
+                continue;
+            }
+            cols[c] = true, board[r][c] = 'Q';
+            backTrack(board, cols, res, r + 1, n);
+            cols[c] = false, board[r][c] = '.';
+        }
+    }
+    bool hasDiagonal(vector<vector<char>>& board, int r, int c, int n) {
+        for (int i = r, j = c; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 'Q') {
+                return true;
+            }
+        }
+        for (int i = r, j = c; i >= 0 && j < n; i--, j++) {
+            if (board[i][j] == 'Q') {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 53. Maximum Subarray
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int cur = nums[0], res = nums[0];
+        for (int i = 1; i < nums.size(); i++) {
+            cur = cur < 0 ? nums[i] : cur + nums[i];
+            res = max(res, cur);
+        }
+        return res;
+    }
+};
+
+// 54. Spiral Matrix
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int top = 0, bottom = matrix.size() - 1, left = 0, right = matrix[0].size() - 1;
+        vector<int> res;
+        while (top <= bottom && left <= right) {
+            for (int i = left; i <= right; i++) {
+                res.push_back(matrix[top][i]);
+            }
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                res.push_back(matrix[i][right]);
+            }
+            right--;
+            for (int i = right; i >= left; i--) {
+                if (top > bottom) {
+                    break;
+                }
+                res.push_back(matrix[bottom][i]);
+            }
+            bottom--;
+            for (int i = bottom; i >= top; i--) {
+                if (left > right) {
+                    break;
+                }
+                res.push_back(matrix[i][left]);
+            }
+            left++;
+        }
+        return res;
+    }
+};
+
+// 55. Jump Game
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int cur = 0, des = nums.size() - 1;
+        for (int i = 0; i < nums.size(); i++) {
+            if (cur < i) {
+                return false;
+            }
+            cur = max(cur, i + nums[i]);
+        }
+        return cur >= des;
+    }
+};
+
+// 56. Merge Intervals
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        if (intervals.size() == 1) {
+            return intervals;
+        }
+        vector<vector<int>> res;
+        sort(intervals.begin(), intervals.end());
+        res.push_back(intervals[0]);
+        for (int i = 1; i < intervals.size(); i++) {
+            vector<int>& tmp = res.back();
+            if (tmp[1] < intervals[i][0]) {
+                res.push_back(intervals[i]);
+            } else {
+                tmp[1] = max(tmp[1], intervals[i][1]);
+            }
+        }
+        return res;
+    }
+};
+
+// 57. Insert Interval
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        int i = 0;
+        for (; i < intervals.size() && intervals[i][0] <= newInterval[1]; i++) {
+            if (intervals[i][1] < newInterval[0]) {
+                res.push_back(intervals[i]);
+            } else {
+                newInterval[0] = min(newInterval[0], intervals[i][0]);
+                newInterval[1] = max(newInterval[1], intervals[i][1]);
+            }
+        }
+        res.push_back(newInterval);
+        res.insert(res.end(), intervals.begin() + i, intervals.end());
+        return res;
+    }
+};
+
+// 58. Length of Last Word
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        int res = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (s[i] != ' ') {
+                res++;
+            } else if (res > 0) {
+                return res;
+            }
+        }
+        return res;
+    }
+};
+
+// 59. Spiral Matrix II
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int>> res(n, vector<int>(n, 0));
+        int count = 0, top = 0, bottom = n - 1, left = 0, right = n - 1;
+        while (top <= bottom && left <= right) {
+            for (int i = left; i <= right; i++) {
+                res[top][i] = ++count;
+            }
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                res[i][right] = ++count;
+            }
+            right--;
+            for (int i = right; i >= left; i--) {
+                if (top > bottom) {
+                    break;
+                }
+                res[bottom][i] = ++count;
+            }
+            bottom--;
+            for (int i = bottom; i >= top; i--) {
+                if (left > right) {
+                    break;
+                }
+                res[i][left] = ++count;
+            }
+            left++;
+        }
+        return res;
+    }
+};
+
+// 60. Permutation Sequence
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        string res = "", src = "", des = "";
+        int count = 0;
+        for (int i = 1; i <= n; i++) {
+            src.push_back(i + '0');
+            des.push_back('0');
+        }
+        backTrack(res, src, des, count, k, n, 0);
+        return res;
+    }
+    void backTrack(string& res, string& src, string& des, int& count, int k, int n, int pos) {
+        if (pos == n || count >= k) {
+            if (++count == k) {
+                res = des;
+            }
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            if (src[i] == '0') {
+                continue;
+            }
+            des[pos] = src[i];
+            src[i] = '0';
+            backTrack(res, src, des, count, k, n, pos + 1);
+            src[i] = des[pos];
+        }
+    }
+};
+
+// 61. Rotate List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (!head) {
+            return head;
+        }
+        int count = 0;
+        ListNode *tmp = head;
+        while (tmp) {
+            count++, tmp = tmp->next;
+        }
+        int p = k % count;
+        if (p == 0) {
+            return head;
+        }
+        ListNode *fast = head, *slow = head;
+        for (int i = 0; i < p; i++) {
+            fast = fast->next;
+        }
+        while (fast && fast->next) {
+            fast = fast->next, slow = slow->next;
+        }
+        ListNode *res = slow->next;
+        slow->next = NULL, fast->next = head;
+        return res;
+    }
+};
