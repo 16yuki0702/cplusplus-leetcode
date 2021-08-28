@@ -1671,3 +1671,206 @@ public:
         return res;
     }
 };
+
+// 62. Unique Paths
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        int path[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                path[i][j] = (i == 0 || j == 0) ? 1 : path[i - 1][j] + path[i][j - 1];
+            }
+        }
+        return path[m - 1][n - 1];
+    }
+};
+
+// 63. Unique Paths II
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        int r = obstacleGrid.size(), c = obstacleGrid[0].size();
+        int dp[r][c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                } else if (i == 0 && j == 0) {
+                    dp[i][j] = 1;
+                } else if (i == 0) {
+                    dp[i][j] = dp[i][j - 1];
+                } else if (j == 0) {
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        return dp[r - 1][c - 1];
+    }
+};
+
+// 64. Minimum Path Sum
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        int r = grid.size(), c = grid[0].size();
+        int dp[r][c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (i == 0 && j == 0) {
+                    dp[i][j] = grid[i][j];
+                } else if (i == 0) {
+                    dp[i][j] = grid[i][j] + dp[i][j - 1];
+                } else if (j == 0) {
+                    dp[i][j] = grid[i][j] + dp[i - 1][j];
+                } else {
+                    dp[i][j] = grid[i][j] + (dp[i - 1][j] > dp[i][j - 1] ? dp[i][j - 1] : dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[r - 1][c - 1];
+    }
+};
+
+// 65. Valid Number
+class Solution {
+public:
+    bool isNumber(string s) {
+        static regex r(R"_([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)_");
+        return regex_match(s, r);
+    }
+};
+
+// 66. Plus One
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        vector<int> res;
+        int tmp = 1;
+        for (int i = digits.size() - 1; i >= 0; i--) {
+            tmp += digits[i];
+            res.push_back(tmp % 10);
+            tmp /= 10;
+        }
+        if (tmp > 0) {
+            res.push_back(tmp);
+        }
+        for (int i = 0, j = res.size() - 1; i < j; i++, j--) {
+            swap(res[i], res[j]);
+        }
+        return res;
+    }
+};
+
+// 67. Add Binary
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        string res;
+        for (int i = a.size() - 1, j = b.size() - 1, c = 0; i >= 0 || j >= 0 || c; i--, j--) {
+            int x = i >= 0 ? a[i] - '0' : 0;
+            int y = j >= 0 ? b[j] - '0' : 0;
+            int s = x ^ y ^ c;
+            c = (x & y) | (x & c) | (y & c);
+            res = to_string(s) + res;
+        }
+        return res;
+    }
+};
+
+// 68. Text Justification
+class Solution {
+public:
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        vector<string> res;
+        if (maxWidth == 0) {
+            return {""};
+        }
+        int i = 0, j = 0;
+        while (j != words.size()) {
+            int len = -1;
+            while (j < words.size() && len + words[j].size() + 1 <= maxWidth) {
+                len += words[j++].size() + 1;
+            }
+            int space = maxWidth - len + j - i - 1;
+            int k = i;
+            while (space) {
+                words[k++] += " ", space--;
+                if (j != words.size() && (k == j - 1 || k == j)) {
+                    k = i;
+                }
+                if (j == words.size() && k == j) {
+                    k = j - 1;
+                }
+            }
+            string line = "";
+            for (int l = i; l < j; l++) {
+                line += words[l];
+            }
+            res.push_back(line);
+            i = j;
+        }
+        return res;
+    }
+};
+
+// 69. Sqrt(x)
+class Solution {
+public:
+    int mySqrt(int x) {
+        if (x <= 1) {
+            return x;
+        }
+        int res = x / 2;
+        while (true) {
+            int tmp = (res + x / res) / 2;
+            if (tmp >= res) {
+                return res;
+            }
+            res = tmp;
+        }
+    }
+};
+
+// 70. Climbing Stairs
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n < 3) {
+            return n;
+        }
+        int p1 = 1, p2 = 2, res = 0;
+        for (int i = 2; i < n; i++) {
+            res = p1 + p2;
+            p1 = p2;
+            p2 = res;
+        }
+        return res;
+    }
+};
+
+// 71. Simplify Path
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string res, tmp;
+        vector<string> stack;
+        stringstream ss(path);
+        while (getline(ss, tmp, '/')) {
+            if (tmp == "" || tmp == ".") {
+                continue;
+            }
+            if (tmp == ".." && !stack.empty()) {
+                stack.pop_back();
+            } else if (tmp != "..") {
+                stack.push_back(tmp);
+            }
+        }
+        for (string s: stack) {
+            res += "/" + s;
+        }
+        return res.empty() ? "/" : res;
+    }
+};
