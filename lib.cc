@@ -1899,3 +1899,143 @@ public:
         return dp[m][n];
     }
 };
+
+// 73. Set Matrix Zeroes
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int r_len = matrix.size(), c_len = matrix[0].size();
+        bool is_first_r = false, is_first_c = false;
+        for (int i = 0; i < r_len; i++) {
+            for (int j = 0; j < c_len; j++) {
+                if (matrix[i][j] == 0) {
+                    if (i == 0) {
+                        is_first_r = true;
+                    }
+                    if (j == 0) {
+                        is_first_c = true;
+                    }
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < r_len; i++) {
+            for (int j = 1; j < c_len; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (is_first_r) {
+            for (int j = 0; j < c_len; j++) {
+                matrix[0][j] = 0;
+            }
+        }
+        if (is_first_c) {
+            for (int i = 0; i < r_len; i++) {
+                matrix[i][0] = 0;
+            }
+        }
+    }
+};
+
+// 74. Search a 2D Matrix
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int r_len = matrix.size(), c_len = matrix[0].size();
+        if (target < matrix[0][0] || target > matrix[r_len - 1][c_len - 1]) {
+            return false;
+        }
+        int top = 0, bottom = r_len - 1;
+        while (true) {
+            int mid = (top + bottom) / 2;
+            int y = matrix[mid][0];
+            if (y == target) {
+                return true;
+            } else if (y > target) {
+                bottom = mid - 1;
+            } else if (y < target) {
+                top = mid + 1;
+            }
+            if (top > bottom) {
+                break;
+            }
+        }
+        int left = 0, right = c_len - 1;
+        while (true) {
+            int mid = (left + right) / 2;
+            int x = matrix[bottom][mid];
+            if (x == target) {
+                return true;
+            } else if (x > target) {
+                right = mid - 1;
+            } else if (x < target) {
+                left = mid + 1;
+            }
+            if (left > right) {
+                break;
+            }
+        }
+        return false;
+    }
+};
+
+// 75. Sort Colors
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        q_sort(nums, 0, nums.size() - 1);
+    }
+    void q_sort(vector<int>& nums, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int j = left;
+        swap(nums[(left + right) / 2], nums[right]);
+        for (int i = left; i < right; i++) {
+            if (nums[i] < nums[right]) {
+                swap(nums[i], nums[j]);
+                j++;
+            }
+        }
+        swap(nums[j], nums[right]);
+        q_sort(nums, left, j - 1);
+        q_sort(nums, j + 1, right);
+    }
+};
+
+// 76. Minimum Window Substring
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        vector<int> v(128, 0);
+        for (char c: t) {
+            v[c]++;
+        }
+        int start = 0, end = 0, counter = t.size();
+        int min_s = 0, min_len = INT_MAX;
+        while (end < s.size()) {
+            if (v[s[end]] > 0) {
+                counter--;
+            }
+            v[s[end]]--;
+            end++;
+            while (counter == 0) {
+                if (end - start < min_len) {
+                    min_s = start, min_len = end - start;
+                }
+                v[s[start]]++;
+                if (v[s[start]] > 0) {
+                    counter++;
+                }
+                start++;
+            }
+        }
+        if (min_len != INT_MAX) {
+            return s.substr(min_s, min_len);
+        }
+        return "";
+    }
+};
