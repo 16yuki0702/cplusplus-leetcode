@@ -2080,3 +2080,51 @@ public:
         }
     }
 };
+
+// 79. Word Search
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[0].size(); j++) {
+                if (dfs(board, word, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    bool dfs(vector<vector<char>>& b, string& w, int i, int j) {
+        if (!w.size()) {
+            return true;
+        }
+        if (i < 0 || i >= b.size() || j < 0 || j >= b[0].size() || b[i][j] != w[0]) {
+            return false;
+        }
+        char c = b[i][j];
+        b[i][j] = '*';
+        string s = w.substr(1);
+        bool res = dfs(b, s, i - 1, j) || dfs(b, s, i + 1, j) ||
+            dfs(b, s, i, j - 1) || dfs(b, s, i, j + 1);
+        b[i][j] = c;
+        return res;
+    }
+};
+
+// 80. Remove Duplicates from Sorted Array II
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() < 2) {
+            return nums.size();
+        }
+        int p = 2;
+        for (int i = p; i < nums.size(); i++) {
+            if (nums[p - 2] != nums[i]) {
+                nums[p] = nums[i];
+                p++;
+            }
+        }
+        return p;
+    }
+};
