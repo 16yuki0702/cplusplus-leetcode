@@ -2128,3 +2128,83 @@ public:
         return p;
     }
 };
+
+// 81. Search in Rotated Sorted Array II
+class Solution {
+public:
+    bool search(vector<int>& nums, int target) {
+        if (nums.size() == 1) {
+            return nums[0] == target;
+        };
+        int l = 0, r = nums.size() - 1;
+        while (l <= r) {
+            if (nums[l] == target) {
+                return true;
+            } else if (nums[r] == target) {
+                return true;
+            }
+            int m = (l + r) / 2;
+            if (nums[m] == target) {
+                return true;
+            }
+            while ((l < nums.size() - 1 && r > 0) && nums[l] == nums[r]) {
+                l++, r--;
+            }
+            if (nums[l] == target) {
+                return true;
+            } else if (nums[r] == target) {
+                return true;
+            }
+            if (nums[l] > nums[r]) {
+                l = slideLeft(nums, l), r = slideRight(nums, r);
+            } else {
+                if (nums[m] > target) {
+                    l = slideLeft(nums, l), r = m - 1;
+                } else {
+                    r = slideRight(nums, r), l = m + 1;
+                }
+            }
+        }
+        return false;
+    }
+    int slideLeft(vector<int>& nums, int l) {
+        while (l < nums.size() - 1 && nums[l] == nums[l + 1]) {
+            l++;
+        }
+        return ++l;
+    }
+    int slideRight(vector<int>& nums, int r) {
+        while (r > 0 && nums[r] == nums[r - 1]) {
+            r--;
+        }
+        return --r;
+    }
+};
+
+// 82. Remove Duplicates from Sorted List II
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        return deleteDup(head, false);
+    }
+    ListNode* deleteDup(ListNode* head, bool dup) {
+        if (head == nullptr) {
+            return nullptr;
+        }
+        while (head->next != 0 && head->val == head->next->val) {
+            dup = true, head->next = head->next->next;
+        }
+        head->next = deleteDup(head->next, false);
+        return dup ? head->next : head;
+    }
+};
