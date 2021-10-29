@@ -2208,3 +2208,76 @@ public:
         return dup ? head->next : head;
     }
 };
+
+// 83. Remove Duplicates from Sorted List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        ListNode *cur = head;
+        while (cur && cur->next) {
+            if (cur->val == cur->next->val) {
+                ListNode *tmp = cur->next;
+                cur->next = cur->next->next;
+                delete tmp;
+            } else {
+                cur = cur->next;
+            }
+        }
+        return head;
+    }
+};
+
+// 84. Largest Rectangle in Histogram
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        heights.push_back(0);
+        stack<int> stack;
+        int i = 0, m = 0;
+        while (i < heights.size()) {
+            if (stack.empty() || heights[i] >= heights[stack.top()]) {
+                stack.push(i++);
+            } else {
+                int t = stack.top();
+                stack.pop();
+                m = max(m, heights[t] * (stack.empty() ? i : i - stack.top() - 1));
+            }
+        }
+        return m;
+    }
+};
+
+// 85. Maximal Rectangle
+class Solution {
+public:
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        if (matrix.size() == 0) {
+            return 0;
+        }
+        int m = 0;
+        vector<vector<int>> dp(matrix.size(), vector<int>(matrix[0].size(), 0));
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix[0].size(); j++) {
+                if (matrix[i][j] == '1') {
+                    dp[i][j] = (j == 0) ? 1 : dp[i][j - 1] + 1;
+                    int width = dp[i][j];
+                    for (int k = i; k >= 0; k--) {
+                        width = min(width, dp[k][j]);
+                        m = max(m, width * (i - k + 1));
+                    }
+                }
+            }
+        }
+        return m;
+     }
+};
