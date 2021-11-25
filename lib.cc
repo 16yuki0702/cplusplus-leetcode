@@ -2281,3 +2281,98 @@ public:
         return m;
      }
 };
+
+// 86. Partition List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode *less = new ListNode, *greater = new ListNode;
+        ListNode *i = less, * j = greater;
+        while (head) {
+            if (head->val < x) {
+                i->next = head;
+                i = i->next;
+            } else {
+                j->next = head;
+                j = j->next;
+            }
+            head = head->next;
+        }
+        j->next = nullptr;
+        i->next = greater->next;
+        return less->next;
+    }
+};
+
+// 87. Scramble String
+class Solution {
+public:
+    unordered_map<string, bool> m;
+    bool isScramble(string s1, string s2) {
+        if (s1.size() != s2.size()) {
+            return false;
+        }
+        if (s1 == s2 || s1.size() == 0) {
+            return true;
+        }
+        string key = s1 + "" + s2;
+        if (m.find(key) != m.end()) {
+            return m[key];
+        }
+        bool flag = false;
+        for (int i = 1; i < s1.size(); i++) {
+            if (isScramble(s1.substr(0, i), s2.substr(s1.size() - i, i))
+               && isScramble(s1.substr(i, s1.size() - i), s2.substr(0, s1.size() - i))) {
+                flag = true;
+                break;
+            }
+            if (isScramble(s1.substr(0, i), s2.substr(0, i))
+               && isScramble(s1.substr(i, s1.size() - i), s2.substr(i, s1.size() - i))) {
+                flag = true;
+                break;
+            }
+        }
+        m[key] = flag;
+        return flag;
+    }
+};
+
+// 88. Merge Sorted Array
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int i = m - 1, j = n - 1, k = nums1.size() - 1;
+        while (i >= 0 && j >= 0) {
+            if (nums1[i] > nums2[j]) {
+                nums1[k--] = nums1[i--];
+            } else {
+                nums1[k--] = nums2[j--];
+            }
+        }
+        while (j >= 0) {
+            nums1[k--] = nums2[j--];
+        }
+    }
+};
+
+// 89. Gray Code
+class Solution {
+public:
+    vector<int> grayCode(int n) {
+        vector<int> res;
+        for (int i = 0, target = 1 << n; i < target; i++) {
+            res.push_back(i ^ (i >> 1));
+        }
+        return res;
+    }
+};
