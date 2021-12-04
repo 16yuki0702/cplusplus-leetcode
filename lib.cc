@@ -2376,3 +2376,326 @@ public:
         return res;
     }
 };
+
+// 90. Subsets II
+class Solution {
+public:
+    void qSort(vector<int>& nums, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(nums[(left + right) / 2], nums[right]);
+        for (int i = left; i < right; i++) {
+            if (nums[i] < nums[right]) {
+                swap(nums[p], nums[i]);
+                p++;
+            }
+        }
+        swap(nums[p], nums[right]);
+        qSort(nums, left, p - 1);
+        qSort(nums, p + 1, right);
+    }
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> cur;
+        qSort(nums, 0, nums.size() - 1);
+        backTrack(res, nums, cur, 0);
+        return res;
+    }
+    void backTrack(vector<vector<int>>& res, vector<int> nums, vector<int>& cur, int start) {
+        res.push_back(cur);
+        for (int i = start; i < nums.size(); i++) {
+            if (i == start || nums[i] != nums[i - 1]) {
+                cur.push_back(nums[i]);
+                backTrack(res, nums, cur, i + 1);
+                cur.pop_back();
+            }
+        }
+    }
+};
+
+// 91. Decode Ways
+class Solution {
+public:
+    int numDecodings(string s) {
+        if (s.empty() || s[0] == '0') {
+            return 0;
+        }
+        int pre = 1, cur = 1;
+        for (int i = 2; i <= s.size(); i++) {
+            if (s[i - 1] == '0') {
+                if (s[i - 2] == '1' || s[i - 2] == '2') {
+                    cur = pre;
+                } else {
+                    return 0;
+                }
+            } else {
+                int n = atoi(s.substr(i - 2, 2).c_str());
+                int tmp = cur;
+                cur = cur + (n >= 11 && n <= 26 ? pre : 0);
+                pre = tmp;
+            }
+        }
+        return cur;
+    }
+};
+
+// 92. Reverse Linked List II
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        ListNode *dummy = new ListNode(), *pre = dummy, *cur;
+        dummy->next = head;
+        for (int i = 0; i < left - 1; i++) {
+            pre = pre->next;
+        }
+        cur = pre->next;
+        for (int i = 0; i < right - left; i++) {
+            ListNode *tmp = pre->next;
+            pre->next = cur->next;
+            cur->next = cur->next->next;
+            pre->next->next = tmp;
+        }
+        return dummy->next;
+    }
+};
+
+// 93. Restore IP Addresses
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        if (s.empty()) {
+            return vector<string>();
+        }
+        vector<string> res;
+        for (int a = 1; a <= 3; a++) {
+            for (int b = 1; b <= 3; b++) {
+                for (int c = 1; c <= 3; c++) {
+                    for (int d = 1; d <= 3; d++) {
+                        if (a + b + c + d == s.length()) {
+                            int A = stoi(s.substr(0, a));
+                            int B = stoi(s.substr(a, b));
+                            int C = stoi(s.substr(a + b, c));
+                            int D = stoi(s.substr(a + b + c, d));
+                            if (A <= 255 && B <= 255 && C <= 255 && D <= 255) {
+                                string r = to_string(A) + "." + to_string(B) + "." +
+                                    to_string(C) + "." + to_string(D);
+                                if (r.length() == s.length() + 3) {
+                                    res.push_back(r);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 94. Binary Tree Inorder Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        traversal(res, root);
+        return res;
+    }
+    void traversal(vector<int>& res, TreeNode* root) {
+        if (!root) {
+            return;
+        }
+        traversal(res, root->left);
+        res.push_back(root->val);
+        traversal(res, root->right);
+    }
+};
+
+// 95. Unique Binary Search Trees II
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        return recursion(1, n);
+    }
+    vector<TreeNode*> recursion(int start, int end) {
+        if (start > end) {
+            return vector<TreeNode*>(1, nullptr);
+        }
+        vector<TreeNode*> res;
+        for (int i = start; i <= end; i++) {
+            vector<TreeNode*> left = recursion(start, i - 1);
+            vector<TreeNode*> right = recursion(i + 1, end);
+            for (int j = 0; j < left.size(); j++) {
+                for (int k = 0; k < right.size(); k++) {
+                    res.push_back(new TreeNode(i, left[j], right[k]));
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 96. Unique Binary Search Trees
+class Solution {
+public:
+    int numTrees(int n) {
+        vector<int> dp(n + 1, 0);
+        dp[0] = 1, dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            for (int j = 1; j <= i; j++) {
+                dp[i] += dp[j - 1] * dp[i - j];
+            }
+        }
+        return dp[n];
+    }
+};
+
+// 97. Interleaving String
+class Solution {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        if (s1.length() + s2.length() != s3.length()) {
+            return false;
+        }
+        vector<vector<bool>> dp(s1.length() + 1);
+        for (int i = 0; i <= s1.length(); i++) {
+            dp[i] = vector<bool>(s2.length() + 1, false);
+        }
+        dp[0][0] = true;
+        for (int i = 0; i <= s1.length(); i++) {
+            for (int j = 0; j <= s2.length(); j++) {
+                if ((i < s1.size()) && (s3[i + j] == s1[i])) {
+                    dp[i + 1][j] = dp[i][j] || dp[i + 1][j];
+                }
+                if ((j < s2.size()) && (s3[i + j] == s2[j])) {
+                    dp[i][j + 1] = dp[i][j] || dp[i][j + 1];
+                }
+            }
+        }
+        return dp[s1.length()][s2.length()];
+    }
+};
+
+// 98. Validate Binary Search Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        return validate(root, nullptr, nullptr);
+    }
+    bool validate(TreeNode* n, TreeNode* min, TreeNode* max) {
+        if (!n) {
+            return true;
+        }
+        if (min && min->val >= n->val) {
+            return false;
+        }
+        if (max && max->val <= n->val) {
+            return false;
+        }
+        return validate(n->left, min, n) && validate(n->right, n, max);
+    }
+};
+
+// 99. Recover Binary Search Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void recoverTree(TreeNode* root) {
+        TreeNode *prev = nullptr, *first = nullptr, *next = nullptr;
+        recover(root, prev, first, next);
+        swap(first->val, next->val);
+    }
+    void recover(TreeNode* root, TreeNode* &prev, TreeNode* &first, TreeNode* &next) {
+        if (!root) {
+            return;
+        }
+        recover(root->left, prev, first, next);
+        if (prev && root->val < prev->val) {
+            if (!first) {
+                first = prev;
+            }
+            next = root;
+        }
+        prev = root;
+        recover(root->right, prev, first, next);
+    }
+};
+
+// 100. Same Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if (!p && !q) {
+            return true;
+        }
+        if ((!p && q) || (p && !q) || (p->val != q->val)) {
+            return false;
+        }
+        return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
