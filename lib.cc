@@ -2699,3 +2699,162 @@ public:
         return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
     }
 };
+
+// 101. Symmetric Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+        return isSym(root->left, root->right);
+    }
+    bool isSym(TreeNode* left, TreeNode* right) {
+        if (!left && !right) {
+            return true;
+        }
+        if ((!left || !right) || left->val != right->val) {
+            return false;
+        }
+        return isSym(left->right, right->left) && isSym(left->left, right->right);
+    }
+};
+
+// 102. Binary Tree Level Order Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        traversal(res, root, 1);
+        return res;
+    }
+    void traversal(vector<vector<int>>& res, TreeNode* root, int level) {
+        if (!root) {
+            return;
+        }
+        if (res.size() < level) {
+            res.push_back(vector<int>());
+        }
+        res[level - 1].push_back(root->val);
+        traversal(res, root->left, level + 1);
+        traversal(res, root->right, level + 1);
+    }
+};
+
+// 103. Binary Tree Zigzag Level Order Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int>> list, res;
+        traversal(list, root, 1);
+        for (int i = 0; i < list.size(); i++) {
+            res.push_back(vector<int>());
+            vector<int> tmp = list[i];
+            if (i % 2 == 0) {
+                for (int j = 0; j < tmp.size(); j++) {
+                    res[i].push_back(tmp[j]);
+                }
+            } else {
+                for (int j = tmp.size() - 1; j >= 0; j--) {
+                    res[i].push_back(tmp[j]);
+                }
+            }
+        }
+        return res;
+    }
+    void traversal(vector<vector<int>>& list, TreeNode* root, int level) {
+        if (!root) {
+            return;
+        }
+        if (list.size() < level) {
+            list.push_back(vector<int>());
+        }
+        list[level - 1].push_back(root->val);
+        traversal(list, root->left, level + 1);
+        traversal(list, root->right, level + 1);
+    }
+};
+
+// 104. Maximum Depth of Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        return root ? max(maxDepth(root->left) + 1, maxDepth(root->right) + 1) : 0;
+    }
+};
+
+// 105. Construct Binary Tree from Preorder and Inorder Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        return build(preorder, inorder, 0, 0, inorder.size() - 1);
+    }
+    TreeNode* build(vector<int>& pre, vector<int>& in, int pre_start, int in_start, int in_end) {
+        if (pre_start > pre.size() - 1 || in_start > in_end) {
+            return nullptr;
+        }
+        TreeNode* r = new TreeNode(pre[pre_start]);
+        int index = 0;
+        for (int i = in_start; i <= in_end; i++) {
+            if (r->val == in[i]) {
+                index = i;
+                break;
+            }
+        }
+        r->left = build(pre, in, pre_start + 1, in_start, index - 1);
+        r->right = build(pre, in, pre_start + index - in_start + 1, index + 1, in_end);
+        return r;
+    }
+};
