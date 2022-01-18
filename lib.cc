@@ -2894,3 +2894,46 @@ public:
         return t;
     }
 };
+
+// 107. Binary Tree Level Order Traversal II
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        vector<vector<int>> res;
+        int h = 0;
+        height(root, h, 0);
+        while (h != 0 && res.size() < h) {
+            res.push_back(vector<int>());
+        }
+        traverse(res, root, h);
+        return res;
+    }
+    void height(TreeNode* r, int& h, int current) {
+        if (r == nullptr) {
+            return;
+        }
+        h = (++current > h) ? current : h;
+        height(r->left, h, current);
+        height(r->right, h, current);
+    }
+    void traverse(vector<vector<int>>& res, TreeNode* r, int h) {
+        if (r == nullptr) {
+            return;
+        }
+        h--;
+        traverse(res, r->left, h);
+        traverse(res, r->right, h);
+        res[h].push_back(r->val);
+    }
+};
