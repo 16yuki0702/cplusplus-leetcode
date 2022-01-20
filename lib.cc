@@ -2937,3 +2937,129 @@ public:
         res[h].push_back(r->val);
     }
 };
+
+// 108. Convert Sorted Array to Binary Search Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return build(nums, 0, nums.size() - 1);
+    }
+    TreeNode* build(vector<int>& nums, int left, int right) {
+        if (left > right) {
+            return nullptr;
+        }
+        int m = (left + right) / 2;
+        TreeNode* t = new TreeNode(nums[m]);
+        t->left = build(nums, left, m - 1);
+        t->right = build(nums, m + 1, right);
+        return t;
+    }
+};
+
+// 109. Convert Sorted List to Binary Search Tree
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* sortedListToBST(ListNode* head) {
+        vector<int> list;
+        while (head) {
+            list.push_back(head->val);
+            head = head->next;
+        }
+        return build(list, 0, list.size() - 1);
+    }
+    TreeNode* build(vector<int>& list, int left, int right) {
+        if (left > right) {
+            return nullptr;
+        }
+        int m = (left + right) / 2;
+        TreeNode* t = new TreeNode(list[m]);
+        t->left = build(list, left, m - 1);
+        t->right = build(list, m + 1, right);
+        return t;
+    }
+};
+
+// 110. Balanced Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if (root == nullptr) {
+            return true;
+        }
+        if (!isBalanced(root->left) || !isBalanced(root->right)) {
+            return false;
+        }
+        return abs(height(root->left) - height(root->right)) <= 1;
+    }
+    int height(TreeNode* r) {
+        return (r == nullptr) ? 0 : max(height(r->left), height(r->right)) + 1;
+    }
+};
+
+// 111. Minimum Depth of Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        if (root->left != nullptr && root->right != nullptr) {
+            return 1 + min(minDepth(root->left), minDepth(root->right));
+        }
+        return 1 + max(minDepth(root->left), minDepth(root->right));
+    }
+};
