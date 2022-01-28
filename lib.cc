@@ -3063,3 +3063,270 @@ public:
         return 1 + max(minDepth(root->left), minDepth(root->right));
     }
 };
+
+// 112. Path Sum
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        if (root == nullptr) {
+            return false;
+        } else if (root->left == nullptr && root->right == nullptr) {
+            return root->val == targetSum;
+        }
+        return hasPathSum(root->left, targetSum - root->val) || hasPathSum(root->right, targetSum - root->val);
+    }
+};
+
+// 113. Path Sum II
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
+        vector<vector<int>> res;
+        traverse(res, vector<int>(), root, targetSum);
+        return res;
+    }
+    void traverse(vector<vector<int>>& res, vector<int> tmp, TreeNode* r, int sum) {
+        if (r == nullptr) {
+            return;
+        }
+        tmp.push_back(r->val);
+        if (r->left == nullptr && r->right == nullptr) {
+            if (r->val == sum) {
+                res.push_back(tmp);
+            }
+            return;
+        }
+        traverse(res, tmp, r->left, sum - r->val);
+        traverse(res, tmp, r->right, sum - r->val);
+    }
+};
+
+// 114. Flatten Binary Tree to Linked List
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        while (root) {
+            if (root->left) {
+                flatten(root->left);
+                TreeNode* right = root->right;
+                root->right = root->left;
+                root->left = nullptr;
+                while (root->right) {
+                    root = root->right;
+                }
+                root->right = right;
+            }
+            root = root->right;
+        }
+    }
+};
+
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        while (root) {
+            if (root->left) {
+                TreeNode* pre = root->left;
+                while (pre->right) {
+                    pre = pre->right;
+                }
+                pre->right = root->right;
+                root->right = root->left;
+                root->left = nullptr;
+            }
+            root = root->right;
+        }
+    }
+};
+
+// 115. Distinct Subsequences
+class Solution {
+public:
+    int numDistinct(string s, string t) {
+        int m = s.size(), n = t.size();
+        vector<vector<unsigned int>> dp(n + 1, vector<unsigned int>(m + 1));
+        for (int j = 0; j <= m; j++) {
+            dp[0][j] = 1;
+        }
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (t[i - 1] == s[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i][j - 1];
+                } else {
+                    dp[i][j] = dp[i][j - 1];
+                }
+            }
+        }
+        return dp[n][m];
+    }
+};
+
+// 116. Populating Next Right Pointers in Each Node
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+        : val(_val), left(_left), right(_right), next(_next) {}
+};
+*/
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if (root == nullptr) {
+            return root;
+        }
+        if (root->left) {
+            root->left->next = root->right;
+            if (root->next) {
+                root->right->next = root->next->left;
+            }
+            connect(root->left);
+            connect(root->right);
+        }
+        return root;
+    }
+};
+
+// 117. Populating Next Right Pointers in Each Node II
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+        : val(_val), left(_left), right(_right), next(_next) {}
+};
+*/
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if (root == nullptr) {
+            return root;
+        }
+        Node* c = root, *dummy = new Node(0, nullptr, nullptr, nullptr);
+        for (Node* p = dummy; c != nullptr; c = c->next) {
+            if (c->left) {
+                p->next = c->left;
+                p = p->next;
+            }
+            if (c->right) {
+                p->next = c->right;
+                p = p->next;
+            }
+        }
+        connect(dummy->next);
+        dummy->next = nullptr;
+        delete dummy;
+        return root;
+    }
+};
+
+// 118. Pascal's Triangle
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        if (numRows == 1) {
+            return vector<vector<int>>{{1}};
+        } else if (numRows == 2) {
+            return vector<vector<int>>{{1}, {1, 1}};
+        }
+        vector<vector<int>> res = {{1}, {1, 1}};
+        while (res.size() < numRows) {
+            int row_size = res.size() + 1, prev = res.size() - 1;
+            vector<int> tmp(row_size, 1);
+            for (int i = 1; i < row_size - 1; i++) {
+                tmp[i] = res[prev][i - 1] + res[prev][i];
+            }
+            res.push_back(tmp);
+        }
+        return res;
+    }
+};
+
+// 119. Pascal's Triangle II
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        if (rowIndex == 0) {
+            return vector<int>{1};
+        } else if (rowIndex == 1) {
+            return vector<int>{1, 1};
+        }
+        vector<int> prev = {1, 1};
+        while (prev.size() <= rowIndex) {
+            vector<int> next(prev.size() + 1, 1);
+            for (int i = 1; i < prev.size(); i++) {
+                next[i] = prev[i - 1] + prev[i];
+            }
+            prev = next;
+        }
+        return prev;
+    }
+};
+
+// 120. Triangle
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+        if (triangle.size() == 1) {
+            return triangle[0][0];
+        }
+        for (int i = triangle.size() - 2; i >= 0; i--) {
+            for (int j = 0; j < triangle[i].size(); j++) {
+                triangle[i][j] += min(triangle[i + 1][j], triangle[i + 1][j + 1]);
+            }
+        }
+        return triangle[0][0];
+    }
+};
