@@ -3330,3 +3330,163 @@ public:
         return triangle[0][0];
     }
 };
+
+// 121. Best Time to Buy and Sell Stock
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int res = 0, p = 0;
+        for (int i = 1; i < prices.size(); i++) {
+            if (prices[i] - prices[p] > res) {
+                res = prices[i] - prices[p];
+            } else {
+                p = prices[p] < prices[i] ? p : i;
+            }
+        }
+        return res;
+    }
+};
+
+// 122. Best Time to Buy and Sell Stock II
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int buy = 0, sell = 0, res = 0, n = prices.size();
+        while (buy < n && sell < n) {
+            while (buy + 1 < n && prices[buy] > prices[buy + 1]) {
+                buy++;
+            }
+            sell = buy;
+            while (sell + 1 < n && prices[sell] < prices[sell + 1]) {
+                sell++;
+            }
+            res += prices[sell] - prices[buy];
+            buy = sell + 1;
+        }
+        return res;
+    }
+};
+
+// 123. Best Time to Buy and Sell Stock III
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int buy1 = INT_MIN, buy2 = INT_MIN, sell1 = 0, sell2 = 0;
+        for (int i = 0; i < prices.size(); i++) {
+            buy1 = max(buy1, -prices[i]);
+            sell1 = max(sell1, buy1 + prices[i]);
+            buy2 = max(buy2, sell1 - prices[i]);
+            sell2 = max(sell2, buy2 + prices[i]);
+        }
+        return sell2;
+    }
+};
+
+// 124. Binary Tree Maximum Path Sum
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        int m = INT_MIN;
+        traverse(root, m);
+        return m;
+    }
+    int traverse(TreeNode* root, int& m) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int l = traverse(root->left, m);
+        int r = traverse(root->right, m);
+        int t = max(root->val, max(max(root->val + l, root->val + r), root->val + l + r));
+        m = (m < t) ? t : m;
+        return max(root->val, max(root->val + l, root->val + r));
+    }
+};
+
+// 125. Valid Palindrome
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        int left = 0, right = s.size() - 1;
+        while (left <= right) {
+            while (!isTarget(s[left]) && left < right) {
+                left++;
+            }
+            while (!isTarget(s[right]) && left < right) {
+                right--;
+            }
+            if (toLower(s[left]) != toLower(s[right])) {
+                return false;
+            }
+            left++, right--;
+        }
+        return true;
+    }
+    bool isTarget(char c) {
+        return (('A' <= c && c <= 'Z') ||
+                ('a' <= c && c <= 'z') ||
+                ('0' <= c && c <= '9')) ? true : false;
+    }
+    char toLower(char c) {
+        return ('A' <= c && c <= 'Z') ? c + 32 : c;
+    }
+};
+
+// 128. Longest Consecutive Sequence
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> s(nums.begin(), nums.end());
+        int res;
+        for (int i = 0; i < nums.size(); i++) {
+            if (s.count(nums[i] - 1)) {
+                continue;
+            }
+            int tmp = nums[i] + 1;
+            while (s.count(tmp)) {
+                tmp++;
+            }
+            res = max(res, tmp - nums[i]);
+        }
+        return res;
+    }
+};
+
+// 129. Sum Root to Leaf Numbers
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        return traverse(root, 0);
+    }
+    int traverse(TreeNode* r, int prev) {
+        if (r == nullptr) {
+            return 0;
+        }
+        int next = (10 * prev) + r->val;
+        if (r->left == nullptr && r->right == nullptr) {
+            return next;
+        }
+        return traverse(r->left, next) + traverse(r->right, next);
+    }
+};
