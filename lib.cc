@@ -3490,3 +3490,213 @@ public:
         return traverse(r->left, next) + traverse(r->right, next);
     }
 };
+
+// 130. Surrounded Regions
+class Solution {
+public:
+    void dfs(vector<vector<char>>& b, int i, int j, int m, int n) {
+        if (i >= m || i < 0 || j >= n || j < 0) {
+            return;
+        }
+        if (b[i][j] == 'O') {
+            b[i][j] = 'V';
+            dfs(b, i + 1, j, m, n);
+            dfs(b, i - 1, j, m, n);
+            dfs(b, i, j + 1, m, n);
+            dfs(b, i, j - 1, m, n);
+        }
+    }
+    void solve(vector<vector<char>>& board) {
+        int m = board.size(), n = board[0].size();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == 'O' &&
+                   (i == 0 || j == 0 || i == m - 1 || j == n - 1)) {
+                    dfs(board, i, j, m, n);
+                }
+            }
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == 'O') {
+                    board[i][j] = 'X';
+                } else if (board[i][j] == 'V') {
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+};
+
+// 131. Palindrome Partitioning
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> res;
+        vector<string> tmp;
+        partition(s, 0, tmp, res);
+        return res;
+    }
+    void partition(string& s, int start, vector<string>&tmp, vector<vector<string>>& res) {
+        int n = s.length();
+        if (start == n) {
+            res.push_back(tmp);
+        } else {
+            for (int i = start; i < n; i++) {
+                if (isPalindrome(s, start, i)) {
+                    tmp.push_back(s.substr(start, i - start + 1));
+                    partition(s, i + 1, tmp, res);
+                    tmp.pop_back();
+                }
+            }
+        }
+    }
+    bool isPalindrome(string& s, int l, int r) {
+        while (l < r) {
+            if (s[l++] != s[r--]) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+// 132. Palindrome Partitioning II
+class Solution {
+public:
+    int minCut(string s) {
+        vector<int> dp(s.length(), INT_MAX);
+        for (int i = 0; i < s.length(); i++) {
+            dp[i] = isPalindrome(s, 0, i) ? 0 : dp[i - 1] + 1;
+            for (int j = i; j > 0; j--) {
+                if (dp[i] == 1) {
+                    break;
+                }
+                dp[i] = isPalindrome(s, j, i) ? min(dp[i], dp[j - 1] + 1) : dp[i];
+            }
+        }
+        return dp[s.length() - 1];
+    }
+    bool isPalindrome(string& s, int l, int r) {
+        while (l < r) {
+            if (s[l++] != s[r--]) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+// 133. Clone Graph
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+*/
+class Solution {
+public:
+    unordered_map<Node*, Node*> c;
+    Node* cloneGraph(Node* node) {
+        if (node == nullptr) {
+            return node;
+        }
+        if (c.find(node) == c.end()) {
+            c[node] = new Node(node->val, {});
+            for (Node* n : node->neighbors) {
+                c[node]->neighbors.push_back(cloneGraph(n));
+            }
+        }
+        return c[node];
+    }
+};
+
+// 134. Gas Station
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        int sum(0), total(0), res(0);
+        for (int i = 0; i < gas.size(); i++) {
+            sum += gas[i] - cost[i], total += gas[i] - cost[i];
+            if (sum < 0) {
+                res = i + 1;
+                sum = 0;
+            }
+        }
+        return total >= 0 ? res : -1;
+    }
+};
+
+// 135. Candy
+class Solution {
+public:
+    int candy(vector<int>& ratings) {
+        int n = ratings.size();
+        vector<int> left(n, 1), right(n, 1);
+        for (int i = 1; i < n; i++) {
+            if (ratings[i] > ratings[i - 1]) {
+                left[i] = left[i - 1] + 1;
+            }
+        }
+        for (int i = n - 2; i >= 0; i--) {
+            if (ratings[i] > ratings[i + 1]) {
+                right[i] = right[i + 1] + 1;
+            }
+        }
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            res += max(left[i], right[i]);
+        }
+        return res;
+    }
+};
+
+// 136. Single Number
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            res ^= nums[i];
+        }
+        return res;
+    }
+};
+
+// 137. Single Number II
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int n = nums.size();
+        long res(0);
+        int p(0), t(0);
+        for (int i = 0; i < 32; i++) {
+            t = 0;
+            for (int j = 0; j < n; j++) {
+                t += nums[j] & 1;
+                nums[j] >>= 1;
+            }
+            t %= 3;
+            res = res + (t * pow(2, p));
+            p++;
+        }
+        return res;
+    }
+};
