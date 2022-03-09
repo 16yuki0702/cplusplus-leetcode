@@ -3735,3 +3735,25 @@ public:
         return m[head];
     }
 };
+
+// 139. Word Break
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        vector<bool> v(s.length() + 1, false);
+        v[0] = true;
+        for (int i = 0; i < v.size(); i++) {
+            if (!v[i]) {
+                continue;
+            }
+            for (int j = 0; j < wordDict.size(); j++) {
+                string t = wordDict[j];
+                string sub = s.substr(i, t.length());
+                if (!t.compare(sub)) {
+                    v[i + t.length()] = true;
+                }
+            }
+        }
+        return v[s.length()];
+    }
+};
