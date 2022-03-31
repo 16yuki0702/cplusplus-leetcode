@@ -3757,3 +3757,29 @@ public:
         return v[s.length()];
     }
 };
+
+// 140. Word Break II
+class Solution {
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> set;
+        vector<string> res;
+        set.insert(wordDict.begin(), wordDict.end());
+        dfs(s, "", set, res);
+        return res;
+    }
+
+    void dfs(string s, string sentence, unordered_set<string>& set, vector<string>& res) {
+        if (s.empty()) {
+            sentence.pop_back();
+            res.push_back(sentence);
+            return;
+        }
+        for (int i = 1; i <= s.size(); i++) {
+            if (!set.count(s.substr(0, i))) {
+                continue;
+            }
+            dfs(s.substr(i), sentence + s.substr(0, i) + " ", set, res);
+        }
+    }
+};
