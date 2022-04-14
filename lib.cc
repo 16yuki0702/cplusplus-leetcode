@@ -3783,3 +3783,279 @@ public:
         }
     }
 };
+
+// 141. Linked List Cycle
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        ListNode *slow = head, *fast = head;
+        while (fast && fast->next && fast->next->next) {
+            slow = slow->next, fast = fast->next->next;
+            if (slow == fast) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 142. Linked List Cycle II
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        ListNode *slow = head, *fast = head;
+        while (fast && fast->next) {
+            slow = slow->next, fast = fast->next->next;
+            if (slow == fast) {
+                slow = head;
+                while (!(slow == fast)) {
+                    slow = slow->next, fast = fast->next;
+                }
+                return slow;
+            }
+        }
+        return nullptr;
+    }
+};
+
+// 143. Reorder List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        vector<ListNode*> l;
+        while (head) {
+            l.push_back(head);
+            head = head->next;
+        }
+        int left = 0, right = l.size() - 1;
+        while (left < right) {
+            l[left++]->next = l[right];
+            if (left == right) {
+                break;
+            }
+            l[right--]->next = l[left];
+        }
+        l[right]->next = nullptr;
+    }
+};
+
+// 144. Binary Tree Preorder Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> res;
+        traverse(res, root);
+        return res;
+    }
+    void traverse(vector<int>& res, TreeNode* r) {
+        if (r == nullptr) {
+            return;
+        }
+        res.push_back(r->val);
+        traverse(res, r->left);
+        traverse(res, r->right);
+    }
+};
+
+// 145. Binary Tree Postorder Traversal
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        vector<int> res;
+        traverse(res, root);
+        return res;
+    }
+    void traverse(vector<int>& res, TreeNode* r) {
+        if (r == nullptr) {
+            return;
+        }
+        traverse(res, r->left);
+        traverse(res, r->right);
+        res.push_back(r->val);
+    }
+};
+
+// 146. LRU Cache
+class DoubleLinkedList {
+private:
+    int val;
+    int key;
+    DoubleLinkedList* next;
+    DoubleLinkedList* prev;
+public:
+    DoubleLinkedList(int k, int v) {
+        key = k;
+        val = v;
+        next = nullptr;
+        prev = nullptr;
+    }
+    void setVal(int v) {
+        val = v;
+    }
+    int getVal() {
+        return val;
+    }
+    void setKey(int k) {
+        key = k;
+    }
+    int getKey() {
+        return key;
+    }
+    void setNext(DoubleLinkedList* n) {
+        next = n;
+    }
+    DoubleLinkedList* getNext() {
+        return next;
+    }
+    void setPrev(DoubleLinkedList* p) {
+        prev = p;
+    }
+    DoubleLinkedList* getPrev() {
+        return prev;
+    }
+};
+
+class LRUCache {
+private:
+    int cap;
+    int count;
+    map<int, DoubleLinkedList*> m;
+    DoubleLinkedList *head;
+    DoubleLinkedList *tail;
+
+    void reorder(int k) {
+        DoubleLinkedList *tmp = m[k];
+        if (tmp == tail) {
+            if (tmp == head) {
+                return;
+            }
+            // repoint tail
+            tmp->getPrev()->setNext(nullptr);
+            tail = tmp->getPrev();
+
+            // repoint head
+            tmp->setNext(head);
+            head->setPrev(tmp);
+            head = tmp;
+            return;
+        }
+
+        // neither head nor tail
+        if (tmp != head) {
+            tmp->getPrev()->setNext(tmp->getNext());
+            tmp->getNext()->setPrev(tmp->getPrev());
+
+            // put the accessed data to head
+            tmp->setNext(head);
+            head->setPrev(tmp);
+            head = tmp;
+        }
+    }
+public:
+    LRUCache(int capacity) {
+        cap = capacity;
+        head = nullptr;
+        tail = nullptr;
+        m = {};
+        count = 0;
+    }
+    int get(int k) {
+        if (!m[k]) {
+            return -1;
+        }
+        reorder(k);
+        return m[k]->getVal();
+    }
+    void put(int k, int v) {
+        // update cached data
+        if (m[k]) {
+            m[k]->setVal(v);
+            reorder(k);
+            return;
+        }
+
+        // cache new data
+        m[k] = new DoubleLinkedList(k, v);
+        count++;
+
+        // set first element
+        if (head == nullptr) {
+            head = tail = m[k];
+            return;
+        }
+
+        // put new data to head
+        DoubleLinkedList *newHead = m[k];
+        newHead->setNext(head);
+        head->setPrev(newHead);
+        head = newHead;
+
+        // delete least accessed data
+        if (count > cap) {
+            DoubleLinkedList *tmp = tail;
+
+            // set new tail
+            tail = tail->getPrev();
+            tail->setNext(nullptr);
+
+            m.erase(tmp->getKey());
+            delete tmp;
+            count = cap;
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
