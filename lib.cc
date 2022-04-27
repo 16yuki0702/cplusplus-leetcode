@@ -4092,3 +4092,227 @@ public:
         return dummy->next;
     }
 };
+
+// 148. Sort List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) {
+            return head;
+        }
+        ListNode *mid = nullptr, *slow = head, *fast = head;
+        while (fast && fast->next) {
+            mid = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        mid->next = nullptr;
+        ListNode* l1 = sortList(head);
+        ListNode* l2 = sortList(slow);
+        return merge(l1, l2);
+    }
+    ListNode* merge(ListNode* l1, ListNode *l2) {
+        ListNode *dummy = new ListNode(0, nullptr);
+        ListNode *c = dummy;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                c->next = l1;
+                l1 = l1->next;
+            } else {
+                c->next = l2;
+                l2 = l2->next;
+            }
+            c = c->next;
+        }
+        if (l1) {
+            c->next = l1;
+        }
+        if (l2) {
+            c->next = l2;
+        }
+        return dummy->next;
+    }
+};
+
+// 150. Evaluate Reverse Polish Notation
+class Solution {
+public:
+    int evalRPN(vector<string>& tokens) {
+        vector<string> stack;
+        for (string s : tokens) {
+            if (s == "+" || s == "-" || s == "*" || s == "/") {
+                int b = stoi(stack.back());
+                stack.pop_back();
+                int a = stoi(stack.back());
+                stack.pop_back();
+                if (s == "+") {
+                    stack.push_back(to_string(a + b));
+                } else if (s == "-") {
+                    stack.push_back(to_string(a - b));
+                } else if (s == "*") {
+                    stack.push_back(to_string(a * b));
+                } else if (s == "/") {
+                    stack.push_back(to_string(a / b));
+                }
+            } else {
+                stack.push_back(s);
+            }
+        }
+        return stoi(stack.back());
+    }
+};
+
+// 151. Reverse Words in a String
+class Solution {
+public:
+    string reverseWords(string s) {
+        string res, tmp;
+        for (int i = s.size() - 1; i >= 0; i--) {
+            if (s.at(i) == ' ') {
+                if (tmp != "") {
+                    res = (res == "") ? tmp : res + ' ' + tmp;
+                    tmp = "";
+                }
+                continue;
+            }
+            tmp = s.at(i) + tmp;
+        }
+        if (tmp != "") {
+            res = (res == "") ? tmp : res + ' ' + tmp;
+        }
+        return res;
+    }
+};
+
+// 152. Maximum Product Subarray
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int res = nums[0], l = 0, r = 0, n = nums.size() - 1;
+        for (int i = 0; i <= n; i++) {
+            l = (l ? l : 1) * nums[i];
+            r = (r ? r : 1) * nums[n - i];
+            res = max(res, max(l, r));
+        }
+        return res;
+    }
+};
+
+// 153. Find Minimum in Rotated Sorted Array
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int left = 0, right = nums.size() - 1;
+        while (left < right) {
+            if (nums[left] < nums[right]) {
+                return nums[left];
+            }
+            int mid = (left + right) / 2;
+            if (nums[left] <= nums[mid]) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return nums[left];
+    }
+};
+
+// 154. Find Minimum in Rotated Sorted Array II
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int l = 0, r = nums.size() - 1;
+        while (l < r) {
+            int m = l + (r - l) / 2;
+            if (nums[m] > nums[r]) {
+                l = m + 1;
+            } else if (nums[m] < nums[r]) {
+                r = m;
+            } else {
+                r--;
+            }
+        }
+        return nums[l];
+    }
+};
+
+// 155. Min Stack
+class MinStack {
+private:
+    vector<pair<int, int>> s;
+public:
+    MinStack() {
+        s = {};
+    }
+
+    void push(int val) {
+        s.push_back(
+            {
+                val,
+                s.empty() ? val : min(s.back().second, val)
+            }
+        );
+    }
+
+    void pop() {
+        s.pop_back();
+    }
+
+    int top() {
+        return s.back().first;
+    }
+
+    int getMin() {
+        return s.back().second;
+    }
+};
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+
+// 160. Intersection of Two Linked Lists
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        ListNode *t1 = headA, *t2 = headB;
+        while (t1 != t2) {
+            t1 = t1 ? t1->next : headB;
+            t2 = t2 ? t2->next : headA;
+        }
+        return t1;
+    }
+};
