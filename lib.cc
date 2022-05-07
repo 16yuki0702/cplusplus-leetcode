@@ -4316,3 +4316,165 @@ public:
         return t1;
     }
 };
+
+// 162. Find Peak Element
+class Solution {
+public:
+    int findPeakElement(vector<int>& nums) {
+        int left = 0, right = nums.size() - 1;
+        while (left < right) {
+            int m = (left + right) / 2, mr = m + 1;
+            if (nums[m] < nums[mr]) {
+                left = mr;
+            } else {
+                right = m;
+            }
+        }
+        return left;
+    }
+};
+
+// 164. Maximum Gap
+class Solution {
+public:
+    int maximumGap(vector<int>& nums) {
+        qSort(nums, 0, nums.size() - 1);
+        int res = 0;
+        for (int i = 1; i < nums.size(); i++) {
+            res = max(res, nums[i] - nums[i - 1]);
+        }
+        return res;
+    }
+    void qSort(vector<int>& nums, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(nums[(left + right) / 2], nums[right]);
+        for (int i = left; i < right; i++) {
+            if (nums[i] < nums[right]) {
+                swap(nums[p++], nums[i]);
+            }
+        }
+        swap(nums[p], nums[right]);
+        qSort(nums, left, p - 1);
+        qSort(nums, p + 1, right);
+    }
+};
+
+// 165. Compare Version Numbers
+class Solution {
+public:
+    int compareVersion(string version1, string version2) {
+        int i = 0, j = 0;
+        int t1 = 0, t2 = 0;
+        while (i < version1.size() || j < version2.size()) {
+            while (i < version1.size() && version1.at(i) != '.') {
+                t1 = (t1 * 10) + (version1.at(i) - '0');
+                i++;
+            }
+            while (j < version2.size() && version2.at(j) != '.') {
+                t2 = (t2 * 10) + (version2.at(j) - '0');
+                j++;
+            }
+            if (t1 < t2) {
+                return -1;
+            } else if (t1 > t2) {
+                return 1;
+            }
+            i++, j++;
+            t1 = 0, t2 = 0;
+        }
+        return 0;
+    }
+};
+
+// 167. Two Sum II - Input Array Is Sorted
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        int l = 0, r = numbers.size() - 1;
+        while (l < r) {
+            if (numbers[l] + numbers[r] == target) {
+                return {l + 1, r + 1};
+            } else if (numbers[l] + numbers[r] > target) {
+                r--;
+            } else {
+                l++;
+            }
+        }
+        return {};
+    }
+};
+
+// 168. Excel Sheet Column Title
+class Solution {
+public:
+    string convertToTitle(int columnNumber) {
+        string res = "";
+        while (columnNumber) {
+            res = (char)(((columnNumber - 1) % 26) + 'A') + res;
+            columnNumber = (columnNumber - 1) / 26;
+        }
+        return res;
+    }
+};
+
+// 169. Majority Element
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int count = 0, m = nums[0];
+        for (int i = 0; i < nums.size(); i++) {
+            if (!count) {
+                m = nums[i];
+            }
+            count += (m == nums[i]) ? 1 : -1;
+        }
+        return m;
+    }
+};
+
+// 171. Excel Sheet Column Number
+class Solution {
+public:
+    int titleToNumber(string columnTitle) {
+        unsigned int res = 0, digit = 1;
+        for (int i = columnTitle.size() - 1; i >= 0; i--, digit *= 26) {
+            res += ((int)(columnTitle.at(i) - 'A') + 1) * digit;
+         }
+        return res;
+    }
+};
+
+// 172. Factorial Trailing Zeroes
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        unsigned int res = 0, d = 5;
+        while (n) {
+            res += n / 5;
+            d *= 5, n /= 5;
+        }
+        return res;
+    }
+};
+
+// 174. Dungeon Game
+class Solution {
+public:
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        int m = dungeon.size();
+        int n = dungeon[0].size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, INT_MAX));
+        dp[m][n - 1] = 1;
+        dp[m - 1][n] = 1;
+        for (int i = m - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                int hp = min(dp[i + 1][j], dp[i][j + 1]) - dungeon[i][j];
+                dp[i][j] = (hp <= 0 ? 1 : hp);
+            }
+        }
+        return dp[0][0];
+    }
+};
