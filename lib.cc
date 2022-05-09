@@ -4478,3 +4478,51 @@ public:
         return dp[0][0];
     }
 };
+
+// 179. Largest Number
+class Solution {
+public:
+    string largestNumber(vector<int>& nums) {
+        sort(nums.begin(), nums.end(), [](int a, int b){
+            return to_string(a) + to_string(b) > to_string(b) + to_string(a);
+        });
+        string res;
+        for (int i = 0; i < nums.size(); i++) {
+            res += to_string(nums[i]);
+        }
+        return res.at(0) == '0' ? "0" : res;
+    }
+};
+
+// 187. Repeated DNA Sequences
+class Solution {
+public:
+    vector<string> findRepeatedDnaSequences(string s) {
+        unordered_map<string, int> m;
+        vector<string> res;
+        if (s.size() < 10) {
+            return res;
+        }
+        for (int i = 0; i < s.size() - 9; i++) {
+            m[s.substr(i, 10)]++;
+        }
+        for (pair v : m) {
+            if (v.second > 1) {
+                res.push_back(v.first);
+            }
+        }
+        return res;
+    }
+};
+
+// 189. Rotate Array
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        vector<int> res(nums.size(), 0);
+        for (int i = 0; i < nums.size(); i++) {
+            res[(i + k) % nums.size()] = nums[i];
+        }
+        nums = res;
+    }
+};
