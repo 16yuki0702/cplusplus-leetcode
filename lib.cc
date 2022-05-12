@@ -4526,3 +4526,204 @@ public:
         nums = res;
     }
 };
+
+// 190. Reverse Bits
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t res = 0;
+        for (int i = 0; i < 31; i++, res <<= 1, n >>= 1) {
+            res |= (n & 1);
+        }
+        return res |= (n & 1);
+    }
+};
+
+// 191. Number of 1 Bits
+class Solution {
+public:
+    int hammingWeight(uint32_t n) {
+        int res = 0;
+        for (int i = 0; i < 32; i++, n >>= 1) {
+            res += (n & 1) ? 1 : 0;
+        }
+        return res;
+    }
+};
+
+// 198. House Robber
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size(), pre = 0, cur = 0;
+        for (int i = 0; i < n; i++) {
+            int t = max(pre + nums[i], cur);
+            pre = cur;
+            cur = t;
+        }
+        return cur;
+    }
+};
+
+// 199. Binary Tree Right Side View
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> res;
+        collect(res, root, 1);
+        return res;
+    }
+    void collect(vector<int> &res, TreeNode *root, int level) {
+        if (!root) {
+            return;
+        }
+        if (res.size() < level) {
+            res.push_back(root->val);
+        }
+        collect(res, root->right, level + 1);
+        collect(res, root->left, level + 1);
+    }
+};
+
+// 200. Number of Islands
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int res = 0;
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                if (grid[i][j] == '1') {
+                    res++;
+                    check(grid, i, j);
+                }
+            }
+        }
+        return res;
+    }
+    void check(vector<vector<char>>& g, int i, int j) {
+        if (i < 0 || i >= g.size() || j < 0 || j >= g[0].size() || g[i][j] == '0') {
+            return;
+        }
+        g[i][j] = '0';
+        check(g, i - 1, j);
+        check(g, i + 1, j);
+        check(g, i, j - 1);
+        check(g, i, j + 1);
+    }
+};
+
+// 201. Bitwise AND of Numbers Range
+class Solution {
+public:
+    int rangeBitwiseAnd(int left, int right) {
+        int count = 0;
+        while (left != right) {
+            left >>= 1, right >>= 1, count++;
+        }
+        return left << count;
+    }
+};
+
+// 202. Happy Number
+class Solution {
+public:
+    int next(int n) {
+        int res = 0;
+        while (n >= 10) {
+            int t = n % 10;
+            res += t * t;
+            n /= 10;
+        }
+        return res + (n * n);
+    }
+    bool isHappy(int n) {
+        int slow = next(n), fast = next(next(n));
+        while (slow != fast) {
+            slow = next(slow);
+            fast = next(next(fast));
+        }
+        return fast == 1;
+    }
+};
+
+// 203. Remove Linked List Elements
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        ListNode *fake = new ListNode(-1, head);
+        ListNode *cur = fake, *prev = fake;
+        while (cur) {
+            if (cur->val == val) {
+                prev->next = cur->next;
+                cur = cur->next;
+                continue;
+            }
+            prev = cur;
+            cur = cur->next;
+        }
+        return fake->next;
+    }
+};
+
+// 204. Count Primes
+class Solution {
+public:
+    int countPrimes(int n) {
+        vector<bool> m(n, true);
+        int res = 0;
+        for (int i = 2; i < n; i++) {
+            if (!m[i]) {
+                continue;
+            }
+            res++;
+            if (i > sqrt(n)) {
+                continue;
+            }
+            for (int j = i * i; j < n; j += i) {
+                m[j] = false;
+            }
+        }
+        return res;
+    }
+};
+
+// 205. Isomorphic Strings
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        return normalize(s) == normalize(t);
+    }
+    string normalize(string s) {
+        unordered_map<char, char> m;
+        string res = "";
+        char mapc = 'a';
+        for (int i = 0; i < s.size(); i++) {
+            if (!m[s.at(i)]) {
+                m[s.at(i)] = mapc++;
+            }
+            res += m[s.at(i)];
+        }
+        return res;
+    }
+};
