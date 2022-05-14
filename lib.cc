@@ -4727,3 +4727,70 @@ public:
         return res;
     }
 };
+
+// 206. Reverse Linked List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head || !head->next) {
+            return head;
+        }
+        ListNode *h = reverseList(head->next);
+        head->next->next = head;
+        head->next = nullptr;
+        return h;
+    }
+};
+
+// 207. Course Schedule
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> g = buildGraph(numCourses, prerequisites);
+        vector<int> degrees = computeIndegrees(g);
+        for (int i = 0; i < numCourses; i++) {
+            int j = 0;
+            for (; j < numCourses; j++) {
+                if (!degrees[j]) {
+                    break;
+                }
+            }
+            if (j == numCourses) {
+                return false;
+            }
+            degrees[j]--;
+            for (int v : g[j]) {
+                degrees[v]--;
+            }
+        }
+        return true;
+    }
+
+    vector<vector<int>> buildGraph(int n, vector<vector<int>>& p) {
+        vector<vector<int>> g(n);
+        for (int i = 0; i < p.size(); i++) {
+            g[p[i][1]].push_back(p[i][0]);
+        }
+        return g;
+    }
+
+    vector<int> computeIndegrees(vector<vector<int>>& g) {
+        vector<int> degrees(g.size(), 0);
+        for (vector<int> adj : g) {
+            for (int v : adj) {
+                degrees[v]++;
+            }
+        }
+        return degrees;
+    }
+};
