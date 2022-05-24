@@ -4794,3 +4794,459 @@ public:
         return degrees;
     }
 };
+
+// 208. Implement Trie (Prefix Tree)
+class TrieNode {
+public:
+    bool isWord;
+    TrieNode *children[26];
+    TrieNode() {
+        isWord = false;
+        for (int i = 0; i < 26; i++) {
+            children[i] = nullptr;
+        }
+    }
+};
+
+class Trie {
+private:
+    TrieNode* root;
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    void insert(string word) {
+        int c = 0;
+        TrieNode *cur = root;
+        for (int i = 0; i < word.size(); i++) {
+            c = word[i] - 'a';
+            if (cur->children[c] == nullptr) {
+                cur->children[c] = new TrieNode();
+            }
+            cur = cur->children[c];
+        }
+        cur->isWord = true;
+    }
+
+    bool search(string word) {
+        int c = 0;
+        TrieNode *cur = root;
+        for (int i = 0; i < word.size(); i++) {
+            c = word[i] - 'a';
+            cur = cur->children[c];
+            if (cur == nullptr) {
+                return false;
+            }
+        }
+        return cur->isWord;
+    }
+
+    bool startsWith(string prefix) {
+        int c = 0;
+        TrieNode *cur = root;
+        for (int i = 0; i < prefix.size(); i++) {
+            c = prefix[i] - 'a';
+            cur = cur->children[c];
+            if (cur == nullptr) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+
+// 209. Minimum Size Subarray Sum
+class Solution {
+public:
+    int minSubArrayLen(int target, vector<int>& nums) {
+        int l = 0, r = 0, sum = 0, res = INT_MAX;
+        while (r < nums.size()) {
+            sum += nums[r++];
+            while (sum >= target) {
+                res = min(res, r - l);
+                sum -= nums[l++];
+            }
+        }
+        return res == INT_MAX ? 0 : res;
+    }
+};
+
+// 210. Course Schedule II
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> g = buildGraph(numCourses, prerequisites);
+        vector<int> d = computeIndegrees(g);
+        vector<int> order;
+        for (int i = 0; i < numCourses; i++) {
+            int j = 0;
+            for (; j < numCourses; j++) {
+                if (!d[j]) {
+                    order.push_back(j);
+                    break;
+                }
+            }
+            if (j == numCourses) {
+                return {};
+            }
+            d[j]--;
+            for (int v : g[j]) {
+                d[v]--;
+            }
+        }
+        return order;
+    }
+    vector<vector<int>> buildGraph(int n, vector<vector<int>> p) {
+        vector<vector<int>> g(n);
+        for (vector<int> v : p) {
+            g[v[1]].push_back(v[0]);
+        }
+        return g;
+    }
+    vector<int> computeIndegrees(vector<vector<int>>& g) {
+        vector<int> d(g.size(), 0);
+        for (vector<int> adj : g) {
+            for (int v : adj) {
+                d[v]++;
+            }
+        }
+        return d;
+    }
+};
+
+// 211. Design Add and Search Words Data Structure
+class TrieNode {
+public:
+    bool isWord;
+    TrieNode *children[26];
+    TrieNode() {
+        isWord = false;
+        memset(children, NULL, sizeof(children));
+    }
+};
+
+class WordDictionary {
+public:
+    WordDictionary() {
+
+    }
+
+    void addWord(string word) {
+        TrieNode *node = root;
+        for (char c : word) {
+            if (!node->children[c - 'a']) {
+                node->children[c - 'a'] = new TrieNode();
+            }
+            node = node->children[c - 'a'];
+        }
+        node->isWord = true;
+    }
+
+    bool search(string word) {
+        return search(word.c_str(), root);
+    }
+
+private:
+    TrieNode *root = new TrieNode();
+
+    bool search(const char *word, TrieNode *node) {
+        for (int i = 0; word[i] && node; i++) {
+            if (word[i] != '.') {
+                node = node->children[word[i] - 'a'];
+            } else {
+                TrieNode *tmp = node;
+                for (int j = 0; j < 26; j++) {
+                    node = tmp->children[j];
+                    if (search(word + i + 1, node)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return node && node->isWord;
+    }
+};
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary* obj = new WordDictionary();
+ * obj->addWord(word);
+ * bool param_2 = obj->search(word);
+ */
+
+// 212. Word Search II
+class TrieNode {
+public:
+    bool isEnd;
+    vector<TrieNode*> children;
+    TrieNode() {
+        isEnd = false;
+        children = vector<TrieNode*> (26, nullptr);
+    }
+};
+
+class Trie {
+private:
+    TrieNode *root;
+public:
+    Trie(vector<string>& words) {
+        root = new TrieNode();
+        for (int i = 0; i < words.size(); i++) {
+            addWord(words[i]);
+        }
+    }
+    TrieNode *getRoot() {
+        return root;
+    }
+    void addWord(const string& word) {
+        TrieNode *cur = root;
+        for (int i = 0; i < word.size(); i++) {
+            int c = word[i] - 'a';
+            if (cur->children[c] == nullptr) {
+                cur->children[c] = new TrieNode();
+            }
+            cur = cur->children[c];
+        }
+        cur->isEnd = true;
+    }
+};
+
+class Solution {
+public:
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        Trie *t = new Trie(words);
+        TrieNode *n = t->getRoot();
+        set<string> resultSet;
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[0].size(); j++) {
+                findWords(board, i, j, n, "", resultSet);
+            }
+        }
+        vector<string> res;
+        for (string s : resultSet) {
+            res.push_back(s);
+        }
+        return res;
+    }
+    void findWords(vector<vector<char>>& b, int i, int j, TrieNode *n, string w, set<string>& res) {
+        if (i < 0 || i >= b.size() || j < 0 || j >= b[0].size() || b[i][j] == ' ') {
+            return;
+        }
+        if (n->children[b[i][j] - 'a'] != nullptr) {
+            w = w + b[i][j];
+            n = n->children[b[i][j] - 'a'];
+            if (n->isEnd) {
+                res.insert(w);
+            }
+            char c = b[i][j];
+            b[i][j] = ' ';
+            findWords(b, i + 1, j, n, w, res);
+            findWords(b, i - 1, j, n, w, res);
+            findWords(b, i, j + 1, n, w, res);
+            findWords(b, i, j - 1, n, w, res);
+            b[i][j] = c;
+         }
+    }
+};
+
+// 213. House Robber II
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n < 2) {
+            return n ? nums[0] : 0;
+        }
+        return max(robber(nums, 0, n - 2), robber(nums, 1, n - 1));
+    }
+
+    int robber(vector<int>& nums, int l, int r) {
+        int pre = 0, cur = 0;
+        for (int i = l; i <= r; i++) {
+            int temp = max(pre + nums[i], cur);
+            pre = cur;
+            cur = temp;
+        }
+        return cur;
+    }
+};
+
+// 215. Kth Largest Element in an Array
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        qSort(nums, 0, nums.size() - 1);
+        return nums[nums.size() - k];
+    }
+    void qSort(vector<int>& nums, int l, int r) {
+        if (l >= r) {
+            return;
+        }
+        int p = l;
+        swap(nums[(l + r) / 2], nums[r]);
+        for (int i = l; i < r; i++) {
+            if (nums[i] < nums[r]) {
+                swap(nums[i], nums[p++]);
+            }
+        }
+        swap(nums[p], nums[r]);
+        qSort(nums, l, p - 1);
+        qSort(nums, p + 1, r);
+    }
+};
+
+// 216. Combination Sum III
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        vector<vector<int>> res;
+        backTrack(res, {}, 0, k, 1, n);
+        return res;
+    }
+
+    void backTrack(vector<vector<int>>& res, vector<int> tmp, int sum, int k, int first, int n) {
+        if (tmp.size() > k) {
+            return;
+        } else if (sum == n && tmp.size() == k) {
+            res.push_back(tmp);
+            return;
+        }
+        for (int i = first; i <= 9; i++) {
+            sum += i;
+            int idx = tmp.size();
+            tmp.push_back(i);
+            backTrack(res, tmp, sum, k, i + 1, n);
+            tmp.erase(tmp.begin() + idx);
+            sum -= i;
+        }
+    }
+};
+
+// 217. Contains Duplicate
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_map<int, int> m;
+        for (int n: nums) {
+            if (m[n]) {
+                return true;
+            }
+            m[n]++;
+        }
+        return false;
+    }
+};
+
+// 219. Contains Duplicate II
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_map<int, int> m;
+        for (int i = 0; i < nums.size(); i++) {
+            if (m.find(nums[i]) != m.end() && (i - m[nums[i]]) <= k) {
+                return true;
+            }
+            m[nums[i]] = i;
+        }
+        return false;
+    }
+};
+
+// 220. Contains Duplicate III
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+        int n = nums.size();
+        if (n == 0 || k < 0 || t < 0) {
+            return false;
+        }
+        unordered_map<int, int> buckets;
+        for (int i = 0; i < n; ++i) {
+            int bucket = nums[i] / ((long)t + 1);
+            // For negative numbers, we need to decrement bucket by 1
+            // to ensure floor division.
+            // For example, -1/2 = 0 but -1 should be put in Bucket[-1].
+            // Therefore, decrement by 1.
+            if (nums[i] < 0) {
+                --bucket;
+            }
+            if (buckets.find(bucket) != buckets.end()) {
+                return true;
+            } else {
+                buckets[bucket] = nums[i];
+                if (buckets.find(bucket - 1) != buckets.end() && (long)nums[i] - buckets[bucket - 1] <= t) {
+                    return true;
+                }
+                if (buckets.find(bucket + 1) != buckets.end() && (long)buckets[bucket + 1] - nums[i] <= t) {
+                    return true;
+                }
+                if (buckets.size() > k) {
+                    int key_to_remove = nums[i - k] / ((long)t + 1);
+                    if (nums[i - k] < 0) {
+                        --key_to_remove;
+                    }
+                    buckets.erase(key_to_remove);
+                }
+            }
+        }
+        return false;
+    }
+};
+
+// 221. Maximal Square
+class Solution {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size(), dp = 0, pre;
+        vector<int> cur(n, 0);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int t = cur[j];
+                if (!i || !j || matrix[i][j] == '0') {
+                    cur[j] = matrix[i][j] - '0';
+                } else {
+                    cur[j] = min(pre, min(cur[j], cur[j - 1])) + 1;
+                }
+                dp = max(cur[j], dp);
+                pre = t;
+            }
+        }
+        return dp * dp;
+    }
+};
+
+// 222. Count Complete Tree Nodes
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int countNodes(TreeNode* root) {
+        int res = 0;
+        traverse(root, res);
+        return res;
+    }
+    void traverse(TreeNode *r, int& res) {
+        if (r == nullptr) {
+            return;
+        }
+        res++;
+        traverse(r->left, res);
+        traverse(r->right, res);
+    }
+};
