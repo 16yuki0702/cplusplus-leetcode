@@ -5250,3 +5250,144 @@ public:
         traverse(r->right, res);
     }
 };
+
+// 223. Rectangle Area
+class Solution {
+public:
+    int computeArea(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
+        int s1 = (ax2 - ax1) * (ay2 - ay1);
+        int s2 = (bx2 - bx1) * (by2 - by1);
+        if (ax1 >= bx2 || ax2 <= bx1 || ay2 <= by1 || ay1 >= by2) {
+            return s1 + s2;
+        }
+        return s1 - (min(bx2, ax2) - max(ax1, bx1)) * (min(ay2, by2) - max(ay1, by1)) + s2;
+    }
+};
+
+// 224. Basic Calculator
+class Solution {
+public:
+    int calculate(string s) {
+        long res = 0;
+        vector<int> signs(2, 1);
+        for (int i = 0; i < s.size(); i++) {
+            char c = s[i];
+            if (c >= '0') {
+                long number = 0;
+                while (i < s.size() && s[i] >= '0') {
+                    number = 10 * number + s[i++] - '0';
+                }
+                res += signs.back() * number;
+                signs.pop_back();
+                i--;
+            } else if (c == ')') {
+                signs.pop_back();
+            } else if (c != ' ') {
+                signs.push_back(signs.back() * (c == '-' ? -1 : 1));
+            }
+        }
+        return res;
+    }
+};
+
+// 225. Implement Stack using Queues
+class MyStack {
+    queue<int> q;
+public:
+    MyStack() {}
+
+    void push(int x) {
+        q.push(x);
+        for (int i = 1; i < q.size(); i++) {
+            q.push(q.front());
+            q.pop();
+        }
+    }
+
+    int pop() {
+        int v = q.front();
+        q.pop();
+        return v;
+    }
+
+    int top() {
+        return q.front();
+    }
+
+    bool empty() {
+        return q.empty();
+    }
+};
+/**
+ * Your MyStack object will be instantiated and called as such:
+ * MyStack* obj = new MyStack();
+ * obj->push(x);
+ * int param_2 = obj->pop();
+ * int param_3 = obj->top();
+ * bool param_4 = obj->empty();
+ */
+
+// 226. Invert Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if (root == nullptr) {
+            return root;
+        }
+        TreeNode *tmp = root->left;
+        root->left = root->right;
+        root->right = tmp;
+        invertTree(root->left);
+        invertTree(root->right);
+        return root;
+    }
+};
+
+// 227. Basic Calculator II
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> stack;
+        char sign = '+';
+        long res = 0, tmp = 0;
+        for (unsigned int i = 0; i < s.size(); i++) {
+            if (isdigit(s[i])) {
+                tmp = 10 * tmp + s[i] - '0';
+            }
+            if (!isdigit(s[i]) && !isspace(s[i]) || i == s.size() - 1) {
+                if (sign == '-') {
+                    stack.push(-tmp);
+                } else if (sign == '+') {
+                    stack.push(tmp);
+                } else {
+                    int num;
+                    if (sign == '*') {
+                        num = stack.top() * tmp;
+                    } else {
+                        num = stack.top() / tmp;
+                    }
+                    stack.pop();
+                    stack.push(num);
+                }
+                sign = s[i];
+                tmp = 0;
+            }
+        }
+        while (!stack.empty()) {
+            res += stack.top();
+            stack.pop();
+        }
+        return res;
+    }
+};
