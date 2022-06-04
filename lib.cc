@@ -5391,3 +5391,110 @@ public:
         return res;
     }
 };
+
+// 228. Summary Ranges
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        if (nums.size() == 0) {
+            return vector<string>();
+        }
+        vector<string> res;
+        string tmp = to_string(nums[0]);
+        bool flag = false;
+        int t = nums[0];
+        for (int i = 1; i < nums.size(); i++) {
+            if (t + 1 == nums[i]) {
+                t = nums[i];
+                if (!flag) {
+                    tmp = tmp + "->";
+                    flag = true;
+                }
+            } else {
+                if (flag) {
+                    tmp = tmp + to_string(nums[i - 1]);
+                }
+                res.push_back(tmp);
+                t = nums[i];
+                tmp = to_string(nums[i]);
+                flag = false;
+            }
+        }
+        if (tmp != "") {
+            tmp = flag ? tmp + to_string(t) : tmp;
+            res.push_back(tmp);
+        }
+        return res;
+    }
+};
+
+// 229. Majority Element II
+class Solution {　
+public:
+    vector<int> majorityElement(vector<int>& nums) {
+        int count1 = 0, count2 = 0;
+        int tmp1 = -1, tmp2 = -1;
+        vector<int> res;
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] == tmp1) {
+                count1++;
+            } else if (nums[i] == tmp2) {
+                count2++;
+            } else if (count1 == 0) {
+                tmp1 = nums[i];
+                count1++;
+            } else if (count2 == 0) {
+                tmp2 = nums[i];
+                count2++;
+            } else {
+                count1--;
+                count2--;
+            }
+        }
+        count1 = count2 = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] == tmp1) {
+                count1++;
+            } else if (nums[i] == tmp2) {
+                count2++;
+            }
+        }
+        if (count1 > nums.size() / 3) {
+            res.push_back(tmp1);
+        }
+        if (count2 > nums.size() / 3) {
+            res.push_back(tmp2);
+        }
+        return res;
+    }
+};
+
+// 230. Kth Smallest Element in a BST
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        return kth(root, k);
+    }
+    int kth(TreeNode *r, int& k) {
+        if (r == nullptr) {
+            return -1;
+        }
+        int x = kth(r->left, k);
+        if (x == -1) {
+            return --k == 0 ? r->val : kth(r->right, k);
+        } else {
+            return x;
+        }
+    }
+};
