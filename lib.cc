@@ -5498,3 +5498,300 @@ public:
         }
     }
 };
+
+// 231. Power of Two
+class Solution {
+public:
+    bool isPowerOfTwo(int n) {
+        if (n == 1) {
+            return true;
+        }
+        for (long i = 2; i <= n; i *= 2) {
+            if (i == n) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 232. Implement Queue using Stacks
+class MyQueue {
+    stack<int> in;
+    stack<int> out;
+public:
+    MyQueue() {
+
+    }
+
+    void push(int x) {
+        in.push(x);
+    }
+
+    int pop() {
+        int v = peek();
+        out.pop();
+        return v;
+    }
+
+    int peek() {
+        if (out.empty()) {
+            while (!in.empty()) {
+                out.push(in.top());
+                in.pop();
+            }
+        }
+        return out.top();
+    }
+
+    bool empty() {
+        return in.empty() && out.empty();
+    }
+};
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * MyQueue* obj = new MyQueue();
+ * obj->push(x);
+ * int param_2 = obj->pop();
+ * int param_3 = obj->peek();
+ * bool param_4 = obj->empty();
+ */
+
+// 234. Palindrome Linked List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        if (!head || !head->next) {
+            return true;
+        }
+        ListNode *slow(head), *fast(head);
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        if (fast) {
+            slow = slow->next;
+        }
+        ListNode *pre(NULL), *cur(slow), *next;
+        while (cur) {
+            next = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = next;
+        }
+        while (pre) {
+            if (pre->val != head->val) {
+                return false;
+            }
+            pre = pre->next;
+            head = head->next;
+        }
+        return true;
+    }
+};
+
+// 235. Lowest Common Ancestor of a Binary Search Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if ((root->val > p->val) && (root->val > q->val)) {
+            return lowestCommonAncestor(root->left, p, q);
+        }
+        if ((root->val < p->val) && (root->val < q->val)) {
+            return lowestCommonAncestor(root->right, p, q);
+        }
+        return root;
+    }
+};
+
+// 236. Lowest Common Ancestor of a Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (!root || root == p || root == q) {
+            return root;
+        }
+        TreeNode *left = lowestCommonAncestor(root->left, p, q);
+        TreeNode *right = lowestCommonAncestor(root->right, p, q);
+        if (left && right) {
+            return root;
+        } else {
+            return left ? left : right;
+        }
+    }
+};
+
+// 237. Delete Node in a Linked List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void deleteNode(ListNode* node) {
+        ListNode *tmp = node->next;
+        *node = *node->next;
+        delete tmp;
+    }
+};
+
+// 238. Product of Array Except Self
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        vector<int> res(nums.size(), 1);
+        for (int i = 1; i < nums.size(); i++) {
+            res[i] = res[i - 1] * nums[i - 1];
+        }
+        int tmp = 1;
+        for (int i = nums.size() - 1; i >= 1; i--) {
+            tmp *= nums[i];
+            res[i - 1] *= tmp;
+        }
+        return res;
+    }
+};
+
+// 239. Sliding Window Maximum
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        deque<int> buf;
+        vector<int> res;
+        for (auto i = 0; i < nums.size(); i++) {
+            while (!buf.empty() && nums[i] >= nums[buf.back()]) {
+                buf.pop_back();
+            }
+            buf.push_back(i);
+            if (i >= k - 1) {
+                res.push_back(nums[buf.front()]);
+            }
+            if (buf.front() <= i - k + 1) {
+                buf.pop_front();
+            }
+        }
+        return res;
+    }
+};
+
+// 240. Search a 2D Matrix II
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m = matrix.size(), n = m ? matrix[0].size() : 0;
+        int row = 0, col = n - 1;
+        while (row < m && col >= 0) {
+            if (matrix[row][col] == target) {
+                return true;
+            }
+            matrix[row][col] > target ? col-- : row++;
+        }
+        return false;
+    }
+};
+
+// 242. Valid Anagram
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        if (s.size() != t.size()) {
+            return false;
+        }
+        int m[26] = {};
+        for (int i = 0; i < s.size(); i++) {
+            m[s.at(i) - 'a']++;
+        }
+        for (int i = 0; i < t.size(); i++) {
+            if (m[t.at(i) - 'a'] == 0) {
+                return false;
+            }
+            m[t.at(i) - 'a']--;
+        }
+        return true;
+    }
+};
+
+// 257. Binary Tree Paths
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<string> binaryTreePaths(TreeNode* root) {
+        vector<string> res;
+        recursive(res, root, "");
+        return res;
+    }
+    void recursive(vector<string>& res, TreeNode *r, string p) {
+        if (r == nullptr) {
+            return;
+        }
+        p += p != "" ? "->" + to_string(r->val) : to_string(r->val);
+        if (r->left == nullptr && r->right == nullptr) {
+            res.push_back(p);
+            return;
+        }
+        recursive(res, r->left, p);
+        recursive(res, r->right, p);
+    }
+};
+
+// 258. Add Digits
+class Solution {
+public:
+    int addDigits(int num) {
+        int tmp = 0;
+        while (true) {
+            tmp += num % 10;
+            num /= 10;
+            if (num == 0) {
+                if (tmp < 10) {
+                    return tmp;
+                }
+                num = tmp;
+                tmp = 0;
+            }
+        }
+        return -1;
+    }
+};
