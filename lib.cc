@@ -5795,3 +5795,279 @@ public:
         return -1;
     }
 };
+
+// 260. Single Number III
+class Solution {
+public:
+    vector<int> singleNumber(vector<int>& nums) {
+        unordered_map<int, int> m;
+        vector<int> res;
+        for (int i = 0; i < nums.size(); i++) {
+            m[nums[i]]++;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (m[nums[i]] == 1) {
+                res.push_back(nums[i]);
+            }
+        }
+        return res;
+    }
+};
+
+// 263. Ugly Number
+class Solution {
+public:
+    bool isUgly(int n) {
+        if (n == 0) {
+            return false;
+        }
+        if (n == 1) {
+            return true;
+        }
+        while (n % 2 == 0) {
+            n /= 2;
+        }
+        while (n % 3 == 0) {
+            n /= 3;
+        }
+        while (n % 5 == 0) {
+            n /= 5;
+        }
+        return n == 1;
+    }
+};
+
+// 264. Ugly Number II
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        int dp[n];
+        dp[0] = 1;
+        int a = 0, b = 0, c = 0;
+        for (int i = 1; i < n; i++) {
+            dp[i] = min({dp[a] * 2, dp[b] * 3, dp[c] * 5});
+            if (dp[i] == dp[a] * 2) {
+                a++;
+            }
+            if (dp[i] == dp[b] * 3) {
+                b++;
+            }
+            if (dp[i] == dp[c] * 5) {
+                c++;
+            }
+        }
+        return dp[n - 1];
+    }
+};
+
+// 268. Missing Number
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int sum = 0;
+        for (int i = 0; i <= nums.size(); i++) {
+            sum += i;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            sum -= nums[i];
+        }
+        return sum;
+    }
+};
+
+// 274. H-Index
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if (citations.empty()) {
+            return 0;
+        }
+        int n = citations.size();
+        vector<int> m(n + 1, 0);
+        for (int i = 0; i < n; i++) {
+            if (citations[i] >= n) {
+                m[n]++;
+            } else {
+                m[citations[i]]++;
+            }
+        }
+        int paper = 0;
+        for (int i = n; i >= 0; i--) {
+            paper += m[i];
+            if (paper >= i) {
+                return i;
+            }
+        }
+        return -1;
+    }
+};
+
+// 278. First Bad Version
+// The API isBadVersion is defined for you.
+// bool isBadVersion(int version);
+class Solution {
+public:
+    int firstBadVersion(int n) {
+        int res = 1, l = 1, r = n;
+        while (l <= r) {
+            int m = l + ((r - l) / 2);
+            if (isBadVersion(m)) {
+                res = m;
+                r = m - 1;
+            } else {
+                l = m + 1;
+            }
+        }
+        return res;
+    }
+};
+
+// 279. Perfect Squares
+class Solution {
+public:
+    int numSquares(int n) {
+        vector<int> dp(n + 1, INT_MAX);
+        dp[0] = 0;
+        int count = 1;
+        while (count * count <= n) {
+            int sq = count * count;
+            for (int i = sq; i <= n; i++) {
+                dp[i] = min(dp[i - sq] + 1, dp[i]);
+            }
+            count++;
+        }
+        return dp[n];
+    }
+};
+
+// 283. Move Zeroes
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        int i = 0;
+        for (int j = 0; j < nums.size(); j++) {
+            if (nums[j] != 0) {
+                nums[i++] = nums[j];
+            }
+        }
+        for (; i < nums.size(); i++) {
+            nums[i] = 0;
+        }
+    }
+};
+
+// 284. Peeking Iterator
+/*
+ * Below is the interface for Iterator, which is already defined for you.
+ * **DO NOT** modify the interface for Iterator.
+ *
+ *  class Iterator {
+ *		struct Data;
+ * 		Data* data;
+ *		Iterator(const vector<int>& nums);
+ * 		Iterator(const Iterator& iter);
+ *
+ * 		// Returns the next element in the iteration.
+ *		int next();
+ *
+ *		// Returns true if the iteration has more elements.
+ *		bool hasNext() const;
+ *	};
+ */
+class PeekingIterator : public Iterator {
+private:
+    int nextVal;
+    bool hasNextVal;
+public:
+	PeekingIterator(const vector<int>& nums) : Iterator(nums) {
+	    // Initialize any member here.
+	    // **DO NOT** save a copy of nums and manipulate it directly.
+	    // You should only use the Iterator interface methods.
+	    hasNextVal = Iterator::hasNext();
+      if (hasNextVal) {
+          nextVal = Iterator::next();
+      }
+	}
+	
+    // Returns the next element in the iteration without advancing the iterator.
+	int peek() {
+      return nextVal;
+	}
+	
+	// hasNext() and next() should behave the same as in the Iterator interface.
+	// Override them if needed.
+	int next() {
+      int current = nextVal;
+      hasNextVal = Iterator::hasNext();
+      if (hasNextVal) {
+          nextVal = Iterator::next();
+      }
+      return current;
+	}
+	
+	bool hasNext() const {
+	    return hasNextVal;
+	}
+};
+
+// 287. Find the Duplicate Number
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        qSort(nums, 0, nums.size() - 1);
+        for (int i = 0; i < nums.size() - 1; i++) {
+            if (nums[i] == nums[i + 1]) {
+                return nums[i];
+            }
+        }
+        return -1;
+    }
+    void qSort(vector<int>& nums, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(nums[(left + right) / 2], nums[right]);
+        for (int i = left; i < right; i++) {
+            if (nums[i] < nums[right]) {
+                swap(nums[p++], nums[i]);
+            }
+        }
+        swap(nums[p], nums[right]);
+        qSort(nums, left, p - 1);
+        qSort(nums, p + 1, right);
+    }
+};
+
+// 290. Word Pattern
+class Solution {
+public:
+    bool wordPattern(string pattern, string s) {
+        unordered_map<char, int> m1;
+        unordered_map<string, int> m2;
+        int i = 1, k = 0;
+        for (int j = 0; j < pattern.size(); j++) {
+            if (k >= s.size()) {
+                return false;
+            }
+            string tmp = "";
+            for (; k < s.size(); k++) {
+                if (s.at(k) == ' ') {
+                    k++;
+                    break;
+                }
+                tmp += to_string(s.at(k));
+            }
+            if (!m1[pattern.at(j)] && !m2[tmp]) {
+                m1[pattern.at(j)] = m2[tmp] = i++;
+            }
+            if (m1[pattern.at(j)] != m2[tmp]) {
+                return false;
+            }
+        }
+        if (k < s.size()) {
+            return false;
+        }
+        return true;
+    }
+};
