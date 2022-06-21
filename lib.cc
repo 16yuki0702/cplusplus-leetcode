@@ -6071,3 +6071,272 @@ public:
         return true;
     }
 };
+
+// 292. Nim Game
+class Solution {
+public:
+    bool canWinNim(int n) {
+        return n % 4;
+    }
+};
+
+// 295. Find Median from Data Stream
+class MedianFinder {
+private:
+    priority_queue<long> small, large;
+public:
+    MedianFinder() {}
+
+    void addNum(int num) {
+        small.push(num);
+        large.push(-small.top());
+        small.pop();
+        if (small.size() < large.size()) {
+            small.push(-large.top());
+            large.pop();
+        }
+    }
+
+    double findMedian() {
+        return small.size() > large.size() ?
+            small.top() : (small.top() - large.top()) / 2.0;
+    }
+};
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+
+// 297. Serialize and Deserialize Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+private:
+    void serialize(TreeNode *r, ostringstream& o) {
+        if (r) {
+            o << r->val << ' ';
+            serialize(r->left, o);
+            serialize(r->right, o);
+        } else {
+            o << "# ";
+        }
+    }
+
+    TreeNode* deserialize(istringstream& i) {
+        string val;
+        i >> val;
+        if (val == "#") {
+            return nullptr;
+        }
+        TreeNode *r = new TreeNode(stoi(val));
+        r->left = deserialize(i);
+        r->right = deserialize(i);
+        return r;
+    }
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        ostringstream o;
+        serialize(root, o);
+        return o.str();
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        istringstream i(data);
+        return deserialize(i);
+    }
+};
+// Your Codec object will be instantiated and called as such:
+// Codec ser, deser;
+// TreeNode* ans = deser.deserialize(ser.serialize(root));
+
+// 300. Longest Increasing Subsequence
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        int n = nums.size(), res = INT_MIN;
+        vector<int> dp(n, 1);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+            res = max(res, dp[i]);
+        }
+        return res;
+    }
+};
+
+// 303. Range Sum Query - Immutable
+class NumArray {
+private:
+    vector<int> accum;
+public:
+    NumArray(vector<int>& nums) {
+        accum.push_back(0);
+        for (int i = 0; i < nums.size(); i++) {
+            accum.push_back(accum.back() + nums[i]);
+        }
+    }
+
+    int sumRange(int left, int right) {
+        return accum[right + 1] - accum[left];
+    }
+};
+/**
+ * Your NumArray object will be instantiated and called as such:
+ * NumArray* obj = new NumArray(nums);
+ * int param_1 = obj->sumRange(left,right);
+ */
+
+// 304. Range Sum Query 2D - Immutable
+class NumMatrix {
+private:
+    vector<vector<int>> m;
+    int helper(int i, int j) {
+        return i >= 0 && j >= 0 ? m[i][j] : 0;
+    }
+
+public:
+    NumMatrix(vector<vector<int>>& matrix) {
+        m = matrix;
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix[0].size(); j++) {
+                m[i][j] += (helper(i - 1, j) + helper(i, j - 1)) - helper(i - 1, j - 1);
+            }
+        }
+    }
+
+    int sumRegion(int row1, int col1, int row2, int col2) {
+        return helper(row2, col2) - helper(row1 - 1, col2) - helper(row2, col1 - 1)
+            + helper(row1 - 1, col1 - 1);
+    }
+};
+/**
+ * Your NumMatrix object will be instantiated and called as such:
+ * NumMatrix* obj = new NumMatrix(matrix);
+ * int param_1 = obj->sumRegion(row1,col1,row2,col2);
+ */
+
+// 309. Best Time to Buy and Sell Stock with Cooldown
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int buy = INT_MAX;
+        int pfree = 0, last = 0, now = 0, x = 0;
+        for (int i = 0; i < prices.size(); i++) {
+            x = prices[i];
+            now = max(last, x - buy);
+            buy = min(buy, x - pfree);
+            pfree = last;
+            last = now;
+        }
+        return now;
+    }
+};
+
+// 315. Count of Smaller Numbers After Self
+class Solution {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        vector<pair<int, int>> v(nums.size());
+        for (int i = 0; i < nums.size(); i++) {
+            v[i] = make_pair(nums[i], i);
+        }
+        vector<int> count(nums.size(), 0);
+        mergeSort(count, v, 0, nums.size() - 1);
+        return count;
+    }
+    void mergeSort(vector<int>& count, vector<pair<int, int>>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int mid = left + (right - left) / 2;
+        mergeSort(count, v, left, mid);
+        mergeSort(count, v, mid + 1, right);
+        merge(count, v, left, mid, right);
+    }
+    void merge(vector<int>& count, vector<pair<int, int>>& v, int left, int mid, int right) {
+        vector<pair<int, int>> tmp(right - left + 1);
+        int i = left;
+        int j = mid + 1;
+        int k = 0;
+        while (i <= mid && j <= right) {
+            if (v[i].first <= v[j].first) {
+                tmp[k++] = v[j++];
+            } else {
+                count[v[i].second] += right - j + 1;
+                tmp[k++] = v[i++];
+            }
+        }
+        while (i <= mid) {
+            tmp[k++] = v[i++];
+        }
+        while (j <= right) {
+            tmp[k++] = v[j++];
+        }
+        for (int i = left; i <= right; i++) {
+            v[i] = tmp[i - left];
+        }
+    }
+};
+
+// 316. Remove Duplicate Letters
+class Solution {
+public:
+    string removeDuplicateLetters(string s) {
+        unordered_map<char, bool> visited;
+        unordered_map<char, int> m;
+        for (char c : s) {
+            m[c]++;
+        }
+        string result = "";
+        for (char c : s) {
+            m[c]--;
+            if (visited[c]) {
+                continue;
+            }
+            while (!result.empty() && c < result.back() && m[result.back()] > 0) {
+                visited[result.back()] = false;
+                result.pop_back();
+            }
+            result += c;
+            visited[c] = true;
+        }
+        return result;
+    }
+};
+
+// 318. Maximum Product of Word Lengths
+class Solution {
+public:
+    int maxProduct(vector<string>& words) {
+        vector<int> m(words.size());
+        int res = 0;
+        for (int i = 0; i < words.size(); i++) {
+            for (char c : words[i]) {
+                m[i] |= 1 << (c - 'a');
+            }
+        }
+        for (int i = 0; i < words.size(); i++) {
+            for (int j = i + 1; j < words.size(); j++) {
+                if (!(m[i] & m[j])) {
+                    res = max(res, int(words[i].size() * words[j].size()));
+                }
+            }
+        }
+        return res;
+    }
+};
