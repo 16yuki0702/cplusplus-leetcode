@@ -6340,3 +6340,231 @@ public:
         return res;
     }
 };
+
+// 319. Bulb Switcher
+class Solution {
+public:
+    int bulbSwitch(int n) {
+        return floor(sqrt(n));
+    }
+};
+
+// 322. Coin Change
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        vector<int> dp(amount + 1, amount + 1);
+        dp[0] = 0;
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (coin <= i) {
+                    dp[i] = min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+};
+
+// 324. Wiggle Sort II
+class Solution {
+public:
+    int vIndex(int i, int n) {
+        return (2 * i + 1) % (n | 1);
+    }
+    void wiggleSort(vector<int>& nums) {
+        int n = nums.size();
+        auto nth = nums.begin() + n / 2;
+        nth_element(nums.begin(), nth, nums.end());
+        int median = *nth;
+        int first = 0, mid = 0, last = n - 1;
+        while (mid <= last) {
+            if (nums[vIndex(mid, n)] > median) {
+                swap(nums[vIndex(first++, n)], nums[vIndex(mid++, n)]);
+            } else if (nums[vIndex(mid, n)] < median) {
+                swap(nums[vIndex(mid, n)], nums[vIndex(last--, n)]);
+            } else {
+                ++mid;
+            }
+        }
+    }
+};
+
+// 326. Power of Three
+class Solution {
+public:
+    bool isPowerOfThree(int n) {
+        while (n % 3 == 0 && n != 0) {
+            n /= 3;
+        }
+        return n == 1;
+    }
+};
+
+// 328. Odd Even Linked List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* oddEvenList(ListNode* head) {
+        if (head == nullptr) {
+            return head;
+        }
+        ListNode *dummy = new ListNode(-1, head);
+        ListNode *dummy2 = new ListNode(-1, head->next);
+        ListNode *cur = dummy->next;
+        while (cur && cur->next) {
+            ListNode *nex = cur->next;
+            if (!nex->next) {
+                break;
+            }
+            cur->next = nex->next;
+            nex->next = nex->next->next;
+            cur = cur->next;
+            nex = nex->next;
+        }
+        cur->next = dummy2->next;
+        return dummy->next;
+    }
+};
+
+// 331. Verify Preorder Serialization of a Binary Tree
+class Solution {
+public:
+    bool isValidSerialization(string preorder) {
+        preorder += ',';
+        int cap = 1;
+        for (int i = 0; i < preorder.size(); i++) {
+            if (preorder.at(i) != ',') {
+                continue;
+            }
+            cap--;
+            if (cap < 0) {
+                return false;
+            }
+            if (preorder.at(i - 1) != '#') {
+                cap += 2;
+            }
+        }
+        return cap == 0;
+    }
+};
+
+// 334. Increasing Triplet Subsequence
+class Solution {
+public:
+    bool increasingTriplet(vector<int>& nums) {
+        int n1 = INT_MAX, n2 = INT_MAX;
+        for (int x : nums) {
+            if (x <= n1) {
+                n1 = x;
+            } else if (x <= n2) {
+                n2 = x;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 337. House Robber III
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int rob(TreeNode* root) {
+        int l, r;
+        return tryRob(root, l, r);
+    }
+    int tryRob(TreeNode* root, int& l, int& r) {
+        if (!root) {
+            return 0;
+        }
+        int ll = 0, lr = 0, rl = 0, rr = 0;
+        l = tryRob(root->left, ll, lr);
+        r = tryRob(root->right, rl, rr);
+        return max(root->val + ll + lr + rl + rr, l + r);
+    }
+};
+
+// 338. Counting Bits
+class Solution {
+public:
+    vector<int> countBits(int n) {
+        vector<int> res;
+        for (int i = 0; i <= n; i++) {
+            int sum = 0;
+            int tmp = i;
+            while (tmp) {
+                sum += tmp & 1;
+                tmp >>= 1;
+            }
+            res.push_back(sum);
+        }
+        return res;
+    }
+};
+
+// 342. Power of Four
+class Solution {
+public:
+    bool isPowerOfFour(int n) {
+        while (n % 4 == 0 && n != 0) {
+            n /= 4;
+        }
+        return n == 1;
+    }
+};
+
+// 344. Reverse String
+class Solution {
+public:
+    void reverseString(vector<char>& s) {
+        for (int i = 0, j = s.size() - 1; i < j; i++, j--) {
+            swap(s[i], s[j]);
+        }
+    }
+};
+
+// 345. Reverse Vowels of a String
+class Solution {
+public:
+    bool isVowel(char c) {
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u'
+            || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U';
+    }
+    string reverseVowels(string s) {
+        int l = 0, r = s.size() - 1;
+        while (l < r) {
+            while (l < r && !isVowel(s.at(l))) {
+                l++;
+            }
+            while (l < r && !isVowel(s.at(r))) {
+                r--;
+            }
+            if (l < r) {
+                swap(s[l], s[r]);
+                l++, r--;
+            }
+        }
+        return s;
+    }
+};
