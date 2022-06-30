@@ -6568,3 +6568,227 @@ public:
         return s;
     }
 };
+
+// 347. Top K Frequent Elements
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> m;
+        unordered_map<int, vector<int>> m2;
+        vector<int> rank, res;
+        for (int v : nums) {
+            m[v]++;
+        }
+        for (auto it = m.begin(); it != m.end(); it++) {
+            if (m2.find(it->second) == m2.end()) {
+                rank.push_back(it->second);
+            }
+            m2[it->second].push_back(it->first);
+        }
+        qSort(rank, 0, rank.size() - 1);
+        for (int i = rank.size() - 1; k > 0; i--) {
+            for (int v : m2[rank[i]]) {
+                if (k == 0) {
+                    break;
+                }
+                res.push_back(v);
+                k--;
+            }
+        }
+        return res;
+    }
+    void qSort(vector<int>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(v[(left + right) / 2], v[right]);
+        for (int i = left; i < right; i++) {
+            if (v[i] < v[right]) {
+                swap(v[i], v[p++]);
+            }
+        }
+        swap(v[p], v[right]);
+        qSort(v, left, p - 1);
+        qSort(v, p + 1, right);
+    }
+};
+
+// 349. Intersection of Two Arrays
+class Solution {
+public:
+    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        unordered_map<int, int> m;
+        vector<int> res;
+        for (int v : nums1) {
+            m[v] = 1;
+        }
+        for (int v : nums2) {
+            if (m[v]) {
+                res.push_back(v);
+                m[v] = 0;
+            }
+        }
+        return res;
+    }
+};
+
+// 350. Intersection of Two Arrays II
+class Solution {
+public:
+    vector<int> intersect(vector<int>& nums1, vector<int>& nums2) {
+        unordered_map<int, int> m;
+        vector<int> res;
+        for (int v : nums1) {
+            m[v]++;
+        }
+        for (int v : nums2) {
+            if (m[v]) {
+                res.push_back(v);
+                m[v]--;
+            }
+        }
+        return res;
+    }
+};
+
+// 355. Design Twitter
+class Twitter {
+private:
+    vector<pair<int, int>> posts;
+    unordered_map<int, unordered_map<int, int>> follows;
+public:
+    Twitter() {
+
+    }
+
+    void postTweet(int userId, int tweetId) {
+        posts.push_back(make_pair(userId, tweetId));
+    }
+
+    vector<int> getNewsFeed(int userId) {
+        vector<int> feed;
+        int count = 0;
+        for (int i = posts.size() - 1; i >= 0 && count < 10; i--) {
+            if (posts[i].first == userId || follows[userId][posts[i].first]) {
+                feed.push_back(posts[i].second), count++;
+            }
+        }
+        return feed;
+    }
+
+    void follow(int followerId, int followeeId) {
+        follows[followerId][followeeId] = 1;
+    }
+
+    void unfollow(int followerId, int followeeId) {
+        follows[followerId][followeeId] = 0;
+    }
+};
+/**
+ * Your Twitter object will be instantiated and called as such:
+ * Twitter* obj = new Twitter();
+ * obj->postTweet(userId,tweetId);
+ * vector<int> param_2 = obj->getNewsFeed(userId);
+ * obj->follow(followerId,followeeId);
+ * obj->unfollow(followerId,followeeId);
+ */
+
+// 357. Count Numbers with Unique Digits
+class Solution {
+public:
+    int countNumbersWithUniqueDigits(int n) {
+        if (n == 0) {
+            return 1;
+        }
+        int ans = 10, calc = 9, temp = 9;
+        for (int i = 0; i < n - 1; i++) {
+            calc *= temp;
+            ans += calc;
+            temp--;
+        }
+        return ans;
+    }
+};
+
+// 371. Sum of Two Integers
+class Solution {
+public:
+    int getSum(int a, int b) {
+        int sum = a;
+        long mask = 0xFFFFFFFF;
+        while (b != 0) {
+            sum = a ^ b;
+            b = ((a & b) & mask) << 1;
+            a = sum;
+        }
+        return sum;
+    }
+};
+
+// 374. Guess Number Higher or Lower
+/**
+ * Forward declaration of guess API.
+ * @param  num   your guess
+ * @return 	     -1 if num is higher than the picked number
+ *			      1 if num is lower than the picked number
+ *               otherwise return 0
+ * int guess(int num);
+ */
+class Solution {
+public:
+    int guessNumber(int n) {
+        int left = 1, right = n;
+        while (true) {
+            int mid = left + ((right - left) / 2);
+            int g = guess(mid);
+            if (g == 0) {
+                return mid;
+            } else if (g == -1) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+    }
+};
+
+// 376. Wiggle Subsequence
+class Solution {
+public:
+    int wiggleMaxLength(vector<int>& nums) {
+        vector<int> up(nums.size(), 0);
+        vector<int> down(nums.size(), 0);
+        up[0] = down[0] = 1;
+        for (int i = 1; i < nums.size(); i++) {
+            if (nums[i] > nums[i - 1]) {
+                up[i] = down[i - 1] + 1;
+                down[i] = down[i - 1];
+            } else if (nums[i] < nums[i - 1]) {
+                down[i] = up[i - 1] + 1;
+                up[i] = up[i - 1];
+            } else {
+                up[i] = up[i - 1];
+                down[i] = down[i - 1];
+            }
+        }
+        return max(up[nums.size() - 1], down[nums.size() - 1]);
+    }
+};
+
+// 377. Combination Sum IV
+class Solution {
+public:
+    int combinationSum4(vector<int>& nums, int target) {
+        vector<unsigned int> res(target + 1);
+        res[0] = 1;
+        for (int i = 1; i <= target; i++) {
+            for (int x : nums) {
+                if (i >= x) {
+                    res[i] += res[i - x];
+                }
+            }
+        }
+        return res[target];
+    }
+};
