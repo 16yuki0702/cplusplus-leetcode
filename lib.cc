@@ -6792,3 +6792,103 @@ public:
         return res[target];
     }
 };
+
+// 378. Kth Smallest Element in a Sorted Matrix
+class Solution {
+public:
+    int kthSmallest(vector<vector<int>>& matrix, int k) {
+        int n = matrix.size();
+        int low = matrix[0][0], high = matrix[n - 1][n - 1] + 1;
+        int mid = 0, count = 0, tmp = 0;
+        while (low < high) {
+            mid = low + (high - low) / 2;
+            tmp = n - 1;
+            count = 0;
+            for (int i = 0; i < n; i++) {
+                while (tmp >= 0 && matrix[i][tmp] > mid) {
+                    tmp--;
+                }
+                count += tmp + 1;
+            }
+            if (count < k) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    }
+};
+
+// 380. Insert Delete GetRandom O(1)
+class RandomizedSet {
+private:
+    vector<int> nums;
+    unordered_map<int, int> m;
+public:
+    RandomizedSet() {}
+
+    bool insert(int val) {
+        if (m.find(val) != m.end()) {
+            return false;
+        }
+        nums.emplace_back(val);
+        m[val] = nums.size() - 1;
+        return true;
+    }
+
+    bool remove(int val) {
+        if (m.find(val) == m.end()) {
+            return false;
+        }
+        int last = nums.back();
+        m[last] = m[val];
+        nums[m[val]] = last;
+        nums.pop_back();
+        m.erase(val);
+        return true;
+    }
+
+    int getRandom() {
+        return nums[rand() % nums.size()];
+    }
+};
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * RandomizedSet* obj = new RandomizedSet();
+ * bool param_1 = obj->insert(val);
+ * bool param_2 = obj->remove(val);
+ * int param_3 = obj->getRandom();
+ */
+
+// 382. Linked List Random Node
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+private:
+    vector<int> v;
+public:
+    Solution(ListNode* head) {
+        while (head) {
+            v.push_back(head->val);
+            head = head->next;
+        }
+    }
+
+    int getRandom() {
+        return v[random() % v.size()];
+    }
+};
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution* obj = new Solution(head);
+ * int param_1 = obj->getRandom();
+ */
