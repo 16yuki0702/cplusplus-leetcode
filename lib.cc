@@ -6892,3 +6892,116 @@ public:
  * Solution* obj = new Solution(head);
  * int param_1 = obj->getRandom();
  */
+
+// 384. Shuffle an Array
+class Solution {
+private:
+    vector<int> nums;
+public:
+    Solution(vector<int>& nums) {
+        this->nums = nums;
+    }
+
+    vector<int> reset() {
+        return nums;
+    }
+
+    vector<int> shuffle() {
+        vector<int> res(nums);
+        for (int i = 0; i < res.size(); i++) {
+            int pos = rand() % (res.size() - i);
+            swap(res[i + pos], res[i]);
+        }
+        return res;
+    }
+};
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution* obj = new Solution(nums);
+ * vector<int> param_1 = obj->reset();
+ * vector<int> param_2 = obj->shuffle();
+ */
+
+// 386. Lexicographical Numbers
+class Solution {
+public:
+    vector<int> lexicalOrder(int n) {
+        vector<int> res(n);
+        int cur = 1;
+        for (int i = 0; i < n; i++) {
+            res[i] = cur;
+            if (cur * 10 <= n) {
+                cur *= 10;
+            } else {
+                if (cur >= n) {
+                    cur /= 10;
+                }
+                cur += 1;
+                while (cur % 10 == 0) {
+                    cur /= 10;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 389. Find the Difference
+class Solution {
+public:
+    char findTheDifference(string s, string t) {
+        int res = 0;
+        for (char c : s) {
+            res ^= c;
+        }
+        for (char c : t) {
+            res ^= c;
+        }
+        return res;
+    }
+};
+
+// 392. Is Subsequence
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        int i = 0, j = 0;
+        while (i < s.size()) {
+            while (j < t.size() && s.at(i) != t.at(j)) {
+                j++;
+            }
+            if (j == t.size()) {
+                break;
+            }
+            i++, j++;
+        }
+        return i == s.size() && j <= t.size();
+    }
+};
+
+// 393. UTF-8 Validation
+class Solution {
+public:
+    bool validUtf8(vector<int>& data) {
+        int count = 0;
+        for (int c : data) {
+            if (count == 0) {
+                if ((c >> 5) == 0b110) {
+                    count = 1;
+                } else if ((c >> 4) == 0b1110) {
+                    count = 2;
+                } else if ((c >> 3) == 0b11110) {
+                    count = 3;
+                } else if ((c >> 7) == 0b1) {
+                    return false;
+                }
+            } else {
+                if ((c >> 6) != 0b10) {
+                    return false;
+                }
+                count--;
+            }
+        }
+        return count == 0;
+    }
+};
