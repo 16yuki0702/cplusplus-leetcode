@@ -7005,3 +7005,112 @@ public:
         return count == 0;
     }
 };
+
+// 394. Decode String
+class Solution {
+public:
+    string decodeString(const string& s, int& i) {
+        string res;
+        while (i < s.length() && s[i] != ']') {
+            if (!isdigit(s[i])) {
+                res += s[i++];
+            } else {
+                int n = 0;
+                while (i < s.length() && isdigit(s[i])) {
+                    n = n * 10 + s[i++] - '0';
+                }
+                i++;
+                string t = decodeString(s, i);
+                i++;
+                while (n-- > 0) {
+                    res += t;
+                }
+            }
+        }
+        return res;
+    }
+    string decodeString(string s) {
+        int i = 0;
+        return decodeString(s, i);
+    }
+};
+
+// 395. Longest Substring with At Least K Repeating Characters
+class Solution {
+public:
+    int longestSubstring(string s, int k) {
+        if (s.size() == 0 || k > s.size()) {
+            return 0;
+        }
+        if (k == 0) {
+            return s.size();
+        }
+        unordered_map<char, int> m;
+        for (int i = 0; i < s.size(); i++) {
+            m[s[i]]++;
+        }
+        int idx = 0;
+        while (idx < s.size() && m[s[idx]] >= k) {
+            idx++;
+        }
+        if (idx == s.size()) {
+            return s.size();
+        }
+        int left = longestSubstring(s.substr(0, idx), k);
+        int right = longestSubstring(s.substr(idx + 1), k);
+        return max(left, right);
+    }
+};
+
+// 397. Integer Replacement
+class Solution {
+private:
+    int res = 0;
+public:
+    int integerReplacement(int n) {
+        if (n == 1) {
+            return res;
+        }
+        if (n == 3) {
+            res += 2;
+            return res;
+        }
+        if (n == INT_MAX) {
+            return 32;
+        }
+        if (n & 1) {
+            res++;
+            if ((n + 1) % 4 == 0) {
+                integerReplacement(n + 1);
+            } else {
+                integerReplacement(n - 1);
+            }
+        } else {
+            res++;
+            integerReplacement(n / 2);
+        }
+        return res;
+    }
+};
+
+// 398. Random Pick Index
+class Solution {
+private:
+    unordered_map<int, vector<int>> m;
+public:
+    Solution(vector<int>& nums) {
+        for (int i = 0; i < nums.size(); i++) {
+            m[nums[i]].push_back(i);
+        }
+    }
+
+    int pick(int target) {
+        int idx = rand() % m[target].size();
+        return m[target][idx];
+    }
+};
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution* obj = new Solution(nums);
+ * int param_1 = obj->pick(target);
+ */
