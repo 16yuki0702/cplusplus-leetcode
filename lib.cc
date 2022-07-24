@@ -7114,3 +7114,224 @@ public:
  * Solution* obj = new Solution(nums);
  * int param_1 = obj->pick(target);
  */
+
+// 402. Remove K Digits
+class Solution {
+public:
+    string removeKdigits(string num, int k) {
+        if (num.length() <= k) {
+            return "0";
+        }
+        if (k == 0) {
+            return num;
+        }
+        string res = "";
+        stack<char> s;
+        s.push(num[0]);
+        for (int i = 1; i < num.length(); i++) {
+            while (k > 0 && !s.empty() && num[i] < s.top()) {
+                k--;
+                s.pop();
+            }
+            s.push(num[i]);
+            if (s.size() == 1 && num[i] == '0') {
+                s.pop();
+            }
+        }
+        while (k && !s.empty()) {
+            k--;
+            s.pop();
+        }
+        while (!s.empty()) {
+            res.push_back(s.top());
+            s.pop();
+        }
+        reverse(res.begin(), res.end());
+        if (res.length() == 0) {
+            return "0";
+        }
+        return res;
+    }
+};
+
+// 404. Sum of Left Leaves
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int sumOfLeftLeaves(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        if (root->left && !root->left->left && !root->left->right) {
+            return root->left->val + sumOfLeftLeaves(root->right);
+        }
+        return sumOfLeftLeaves(root->left) + sumOfLeftLeaves(root->right);
+    }
+};
+
+// 405. Convert a Number to Hexadecimal
+class Solution {
+private:
+    const string HEX = "0123456789abcdef";
+public:
+    string toHex(int num) {
+        if (num == 0) {
+            return "0";
+        }
+        string res;
+        int count = 0;
+        while (num && count++ < 8) {
+            res = HEX[num & 0xf] + res;
+            num >>= 4;
+        }
+        return res;
+    }
+};
+
+// 406. Queue Reconstruction by Height
+class Solution {
+public:
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        auto comp = [](const vector<int>& p1, const vector<int>& p2) {
+            return p1[0] > p2[0] || p1[0] == p2[0] && p1[1] < p2[1];
+        };
+        sort(people.begin(), people.end(), comp);
+        vector<vector<int>> res;
+        for (auto &p : people) {
+            res.insert(res.begin() + p[1], p);
+        }
+        return res;
+    }
+};
+
+// 409. Longest Palindrome
+class Solution {
+public:
+    int longestPalindrome(string s) {
+        unordered_map<char, int> m;
+        for (char c : s) {
+            m[c]++;
+        }
+        int count = 0;
+        for (auto v : m) {
+            if (v.second % 2 != 0) {
+                count++;
+            }
+        }
+        if (count > 1) {
+            return s.length() - count + 1;
+        }
+        return s.length();
+    }
+};
+
+// 412. Fizz Buzz
+class Solution {
+public:
+    vector<string> fizzBuzz(int n) {
+        vector<string> res;
+        for (int i = 1; i <= n; i++) {
+            if (i % 3 == 0 && i % 5 == 0) {
+                res.push_back("FizzBuzz");
+            } else if (i % 3 == 0) {
+                res.push_back("Fizz");
+            } else if (i % 5 == 0) {
+                res.push_back("Buzz");
+            } else {
+                res.push_back(to_string(i));
+            }
+        }
+        return res;
+    }
+};
+
+// 413. Arithmetic Slices
+class Solution {
+public:
+    int numberOfArithmeticSlices(vector<int>& nums) {
+        if (nums.size() < 3) {
+            return 0;
+        }
+        int count = 0;
+        for (int i = 0; i < nums.size() - 2; i++) {
+            int diff = nums[i + 1] - nums[i];
+            for (int j = i + 2; j < nums.size(); j++) {
+                if (nums[j] - nums[j - 1] == diff) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return count;
+    }
+};
+
+// 414. Third Maximum Number
+class Solution {
+public:
+    int thirdMax(vector<int>& nums) {
+        long v1 = LONG_MIN, v2 = LONG_MIN, v3 = LONG_MIN;
+        for (int n : nums) {
+            if (n == v1 || n == v2 || n == v3) {
+                continue;
+            }
+            if (n >= v1) {
+                v3 = v2;
+                v2 = v1;
+                v1 = n;
+            } else if (n >= v2) {
+                v3 = v2;
+                v2 = n;
+            } else if (n >= v3) {
+                v3 = n;
+            }
+        }
+        if (v3 != LONG_MIN) {
+            return v3;
+        } else if (v1 != LONG_MIN) {
+            return v1;
+        } else {
+            return v2;
+        }
+    }
+};
+
+// 415. Add Strings
+class Solution {
+public:
+    string addStrings(string num1, string num2) {
+        string l, s;
+        if (num1.length() >= num2.length()) {
+            l = num1, s = num2;
+        } else {
+            l = num2, s = num1;
+        }
+        string res;
+        int i = s.length() - 1, j = l.length() - 1;
+        bool carry = false;
+        while (i >= 0) {
+            int v1 = s[i--] - '0', v2 = l[j--] - '0';
+            int sum = carry ? v1 + v2 + 1 : v1 + v2;
+            carry = sum >= 10 ? true : false;
+            res = char((sum % 10) + '0') + res;
+        }
+        while (j >= 0) {
+            int v = l[j--] - '0';
+            int sum = carry ? v + 1 : v;
+            carry = sum >= 10 ? true : false;
+            res = char((sum % 10) + '0') + res;
+        }
+        return carry ? '1' + res : res;
+    }
+};
