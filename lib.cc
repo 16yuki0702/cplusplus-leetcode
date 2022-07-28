@@ -7335,3 +7335,159 @@ public:
         return carry ? '1' + res : res;
     }
 };
+
+// 416. Partition Equal Subset Sum
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int sum = 0;
+        for (int n : nums) {
+            sum += n;
+        }
+        if (sum & 1) {
+            return false;
+        }
+        vector<int> dp(sum / 2 + 1, 0);
+        dp[0] = 1;
+        for (int i = 0; i < nums.size(); i++) {
+            for (int j = sum / 2; j >= nums[i]; j--) {
+                dp[j] = dp[j] || dp[j - nums[i]];
+            }
+        }
+        return dp[sum / 2];
+    }
+};
+
+// 419. Battleships in a Board
+class Solution {
+public:
+    int countBattleships(vector<vector<char>>& board) {
+        if (board.empty() || board[0].empty()) {
+            return 0;
+        }
+        int row = board.size(), col = board[0].size();
+        int res = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (board[i][j] == 'X') {
+                    if (i > 0 && board[i - 1][j] == 'X') {
+                        continue;
+                    }
+                    if (j > 0 && board[i][j - 1] == 'X') {
+                        continue;
+                    }
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 424. Longest Repeating Character Replacement
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        int res = 0, maxf = 0;
+        unordered_map<int, int> m;
+        for (int i = 0; i < s.length(); i++) {
+            maxf = max(maxf, ++m[s[i]]);
+            if (res - maxf < k) {
+                res++;
+            } else{
+                m[s[i - res]]--;
+            }
+        }
+        return res;
+    }
+};
+
+// 429. N-ary Tree Level Order Traversal
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+class Solution {
+public:
+    vector<vector<int>> levelOrder(Node* root) {
+        vector<vector<int>> res;
+        traversal(res, root, 1);
+        return res;
+    }
+    void traversal(vector<vector<int>>& res, Node* root, int level) {
+        if (!root) {
+            return;
+        }
+        if (res.size() < level) {
+            res.push_back({});
+        }
+        res[level - 1].push_back(root->val);
+        for (auto c : root->children) {
+            traversal(res, c, level + 1);
+        }
+    }
+};
+
+// 430. Flatten a Multilevel Doubly Linked List
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* prev;
+    Node* next;
+    Node* child;
+};
+*/
+class Solution {
+public:
+    Node* flatten(Node* head) {
+        stack<Node*> s;
+        Node* h = head;
+        while (head) {
+            if (head->child) {
+                if (head->next) {
+                    s.push(head->next);
+                }
+                head->next = head->child;
+                head->child = nullptr;
+                head->next->prev = head;
+            } else if (!head->next && !s.empty()) {
+                head->next = s.top();
+                head->next->prev = head;
+                s.pop();
+            }
+            head = head->next;
+        }
+        return h;
+    }
+};
+
+// 434. Number of Segments in a String
+class Solution {
+public:
+    int countSegments(string s) {
+        int res = 0;
+        for (int i = 1; i < s.size(); i++) {
+            if (s[i] == ' ' && s[i - 1] != ' ') {
+                res++;
+            }
+        }
+        return s.size() > 0 && s[s.size() - 1] != ' ' ? res + 1 : res;
+    }
+};
