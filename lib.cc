@@ -7491,3 +7491,569 @@ public:
         return s.size() > 0 && s[s.size() - 1] != ' ' ? res + 1 : res;
     }
 };
+
+// 437. Path Sum III
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int pathSum(TreeNode* root, int targetSum) {
+        if (!root) {
+            return 0;
+        }
+        return traverse(root, targetSum) +
+            pathSum(root->left, targetSum) +
+            pathSum(root->right, targetSum);
+    }
+    int traverse(TreeNode* root, long sum) {
+        if (!root) {
+            return 0;
+        }
+        return (root->val == sum) +
+            traverse(root->left, sum - root->val) +
+            traverse(root->right, sum - root->val);
+    }
+};
+
+// 441. Arranging Coins
+class Solution {
+public:
+    int arrangeCoins(int n) {
+        int res = 0, s = 1;
+        while (n >= s) {
+            n -= s++, res++;
+        }
+        return res;
+    }
+};
+
+// 442. Find All Duplicates in an Array
+class Solution {
+public:
+    vector<int> findDuplicates(vector<int>& nums) {
+        vector<int> res;
+        for (int n : nums) {
+            nums[abs(n) - 1] = -nums[abs(n) - 1];
+            if (nums[abs(n) - 1] > 0) {
+                res.push_back(abs(n));
+            }
+        }
+        return res;
+    }
+};
+
+// 443. String Compression
+class Solution {
+public:
+    int compress(vector<char>& chars) {
+        if (chars.size() < 2) {
+            return chars.size();
+        }
+        int i = 0, j = 0;
+        while (i < chars.size()) {
+            chars[j] = chars[i];
+            int count = 0;
+            while (i < chars.size() && chars[i] == chars[j]) {
+                count++, i++;
+            }
+            if (count == 1) {
+                j++;
+            } else {
+                string s = to_string(count);
+                for (char c : s) {
+                    chars[++j] = c;
+                }
+                j++;
+            }
+        }
+        return j;
+    }
+};
+
+// 445. Add Two Numbers II
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        vector<int> n1, n2;
+        while (l1) {
+            n1.push_back(l1->val);
+            l1 = l1->next;
+        }
+        while (l2) {
+            n2.push_back(l2->val);
+            l2 = l2->next;
+        }
+        int i = n1.size() - 1, j = n2.size() - 1;
+        int sum = 0, carry = 0;
+        ListNode *head = nullptr, *p = nullptr;
+        for ( ; i >= 0 || j >= 0 || carry > 0; i--, j--) {
+            sum = carry;
+            if (i >= 0) {
+                sum += n1[i];
+            }
+            if (j >= 0) {
+                sum += n2[j];
+            }
+            carry = sum / 10;
+            p = new ListNode(sum % 10);
+            p->next = head;
+            head = p;
+        }
+        return head;
+    }
+};
+
+// 448. Find All Numbers Disappeared in an Array
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int len = nums.size();
+        for (int i = 0; i < len; i++) {
+            int n = abs(nums[i]) - 1;
+            nums[n] = nums[n] > 0 ? -nums[n] : nums[n];
+        }
+        vector<int> res;
+        for (int i = 0; i < len; i++) {
+            if (nums[i] > 0) {
+                res.push_back(i + 1);
+            }
+        }
+        return res;
+    }
+};
+
+// 449. Serialize and Deserialize BST
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (!root) {
+            return "";
+        }
+        return to_string(root->val) + "-" + serialize(root->left) + serialize(root->right);
+    }
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        stringstream ss(data);
+        string item;
+        TreeNode* r = nullptr;
+        while (getline(ss, item, '-')) {
+            r = insert(r, stoi(item));
+        }
+        return r;
+    }
+private:
+    TreeNode* insert(TreeNode* r, int v) {
+        if (!r) {
+            return new TreeNode(v);
+        }
+        if (v <= r->val) {
+            r->left = insert(r->left, v);
+        } else {
+            r->right = insert(r->right, v);
+        }
+        return r;
+    }
+};
+// Your Codec object will be instantiated and called as such:
+// Codec* ser = new Codec();
+// Codec* deser = new Codec();
+// string tree = ser->serialize(root);
+// TreeNode* ans = deser->deserialize(tree);
+// return ans;
+
+// 450. Delete Node in a BST
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (!root) {
+            return root;
+        } else if (root->val > key) {
+            root->left = deleteNode(root->left, key);
+        } else if (root->val < key) {
+            root->right = deleteNode(root->right, key);
+        } else {
+            if (!root->right) {
+                return root->left;
+            } else if (!root->left) {
+                return root->right;
+            } else {
+                root->val = findMin(root->right);
+                root->right = deleteNode(root->right, root->val);
+            }
+        }
+        return root;
+    }
+private:
+    int findMin(TreeNode* r) {
+        while (r->left) {
+            r = r->left;
+        }
+        return r->val;
+    }
+};
+
+// 451. Sort Characters By Frequency
+class Solution {
+public:
+    string frequencySort(string s) {
+        unordered_map<char, int> m;
+        vector<string> bucket(s.size() + 1, "");
+        string res;
+        for (char c : s) {
+            m[c]++;
+        }
+        for (auto& it : m) {
+            char c = it.first;
+            int n = it.second;
+            bucket[n].append(n, c);
+        }
+        for (int i = s.size(); i > 0; i--) {
+            if (!bucket[i].empty()) {
+                res.append(bucket[i]);
+            }
+        }
+        return res;
+    }
+};
+
+// 453. Minimum Moves to Equal Array Elements
+class Solution {
+public:
+    int minMoves(vector<int>& nums) {
+        int m = INT_MAX;
+        for (int n : nums) {
+            m = min(m, n);
+        }
+        int res = 0;
+        for (int n : nums) {
+            res += n - m;
+        }
+        return res;
+    }
+};
+
+// 454. 4Sum II
+class Solution {
+public:
+    int fourSumCount(vector<int>& nums1, vector<int>& nums2, vector<int>& nums3, vector<int>& nums4) {
+        map<int, int> m;
+        for (int k : nums3) {
+            for (int l : nums4) {
+                m[k + l]++;
+            }
+        }
+        int res = 0;
+        for (int i : nums1) {
+            for (int j : nums2) {
+                res += m[-(i + j)];
+            }
+        }
+        return res;
+    }
+};
+
+// 455. Assign Cookies
+class Solution {
+public:
+    int findContentChildren(vector<int>& g, vector<int>& s) {
+        qSort(g, 0, g.size() - 1);
+        qSort(s, 0, s.size() - 1);
+        int i = 0, j = 0;
+        while (i < g.size() && j < s.size()) {
+            if (s[j] >= g[i]) {
+                i++;
+            }
+            j++;
+        }
+        return i;
+    }
+    void qSort(vector<int>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(v[(left + right) / 2], v[right]);
+        for (int i = left; i < right; i++) {
+            if (v[i] < v[right]) {
+                swap(v[i], v[p++]);
+            }
+        }
+        swap(v[p], v[right]);
+        qSort(v, left, p - 1);
+        qSort(v, p + 1, right);
+    }
+};
+
+// 459. Repeated Substring Pattern
+class Solution {
+public:
+    bool repeatedSubstringPattern(string s) {
+        int i = 1, j = 0, n = s.size();
+        vector<int> dp(n + 1, 0);
+        while (i < s.size()) {
+            if (s[i] == s[j]) {
+                dp[++i] = ++j;
+            } else if (j == 0) {
+                i++;
+            } else {
+                j = dp[j];
+            }
+        }
+        return dp[n] && dp[n] % (n - dp[n]) == 0;
+    }
+};
+
+// 461. Hamming Distance
+class Solution {
+public:
+    int hammingDistance(int x, int y) {
+        int z = x ^ y;
+        int res = 0;
+        while (z > 0) {
+            res += z & 1;
+            z >>= 1;
+        }
+        return res;
+    }
+};
+
+// 462. Minimum Moves to Equal Array Elements II
+class Solution {
+public:
+    int minMoves2(vector<int>& nums) {
+        int n = nums.size(), res = 0;
+        qSort(nums, 0, n - 1);
+        int m = nums[n / 2];
+        for (int i = 0; i < n; i++) {
+            res += abs(nums[i] - m);
+        }
+        return res;
+    }
+    void qSort(vector<int>& v, int l, int r) {
+        if (l >= r) {
+            return;
+        }
+        int p = l;
+        swap(v[(l + r) / 2], v[r]);
+        for (int i = l; i < r; i++) {
+            if (v[i] < v[r]) {
+                swap(v[p++], v[i]);
+            }
+        }
+        swap(v[p], v[r]);
+        qSort(v, l, p - 1);
+        qSort(v, p + 1, r);
+    }
+};
+
+// 463. Island Perimeter
+class Solution {
+public:
+    int islandPerimeter(vector<vector<int>>& grid) {
+        int res = 0, n = grid.size(), m = grid[0].size();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (!grid[i][j]) {
+                    continue;
+                }
+                if ((j > 0 && !grid[i][j - 1]) || j == 0) {
+                    res++;
+                }
+                if ((i > 0 && !grid[i - 1][j]) || i == 0) {
+                    res++;
+                }
+                if ((j < m - 1 && !grid[i][j + 1]) || j == m - 1) {
+                    res++;
+                }
+                if ((i < n - 1 && !grid[i + 1][j]) || i == n - 1) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 476. Number Complement
+class Solution {
+public:
+    int findComplement(int num) {
+        unsigned int mask = ~0;
+        while (mask & num) {
+            mask <<= 1;
+        }
+        return ~mask & ~num;
+    }
+};
+
+// 477. Total Hamming Distance
+class Solution {
+public:
+    int totalHammingDistance(vector<int>& nums) {
+        if (nums.size() <= 0) {
+            return 0;
+        }
+        int res = 0;
+        for (int i = 0; i < 32; i++) {
+            int setCount = 0;
+            for (int j = 0; j < nums.size(); j++) {
+                if (nums[j] & (1 << i)) {
+                    setCount++;
+                }
+            }
+            res += setCount * (nums.size() - setCount);
+        }
+        return res;
+    }
+};
+
+// 485. Max Consecutive Ones
+class Solution {
+public:
+    int findMaxConsecutiveOnes(vector<int>& nums) {
+        int res = 0, tmp = 0;
+        for (int n : nums) {
+            if (n == 0) {
+                tmp = 0;
+                continue;
+            }
+            res = max(res, ++tmp);
+        }
+        return res;
+    }
+};
+
+// 491. Increasing Subsequences
+class Solution {
+public:
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> tmp;
+        recursive(res, nums, tmp, 0);
+        return res;
+    }
+    void recursive(vector<vector<int>>& res, vector<int>& nums, vector<int> tmp, int start) {
+        if (tmp.size() > 1) {
+            res.push_back(tmp);
+        }
+        unordered_set<int> h;
+        for (int i = start; i < nums.size(); i++) {
+            if ((tmp.empty() || tmp.back() <= nums[i]) && h.find(nums[i]) == h.end()) {
+                tmp.push_back(nums[i]);
+                recursive(res, nums, tmp, i + 1);
+                tmp.pop_back();
+                h.insert(nums[i]);
+            }
+        }
+    }
+};
+
+// 492. Construct the Rectangle
+class Solution {
+public:
+    vector<int> constructRectangle(int area) {
+        int a = sqrt(area);
+        while (area % a) {
+            a--;
+        }
+        return {area / a, a};
+    }
+};
+
+// 494. Target Sum
+class Solution {
+public:
+    int findTargetSumWays(vector<int>& nums, int target) {
+        int res = 0;
+        recursive(nums, target, 0, 0, res);
+        return res;
+    }
+
+    void recursive(vector<int>& nums, int target, int i, int tmp, int& res) {
+        if (i >= nums.size()) {
+            if (target == tmp) {
+                res++;
+            }
+            return;
+        }
+        recursive(nums, target, i + 1, tmp + nums[i], res);
+        recursive(nums, target, i + 1, tmp + -nums[i], res);
+    }
+};
+
+// 495. Teemo Attacking
+class Solution {
+public:
+    int findPoisonedDuration(vector<int>& timeSeries, int duration) {
+        int res = 0;
+        for (int i = 0; i < timeSeries.size() - 1; i++) {
+            if (timeSeries[i + 1] - timeSeries[i] < duration) {
+                res += timeSeries[i + 1] - timeSeries[i];
+            } else {
+                res += duration;
+            }
+        }
+        return res + duration;
+    }
+};
+
+// 496. Next Greater Element I
+class Solution {
+public:
+    vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2) {
+        unordered_map<int, int> m;
+        stack<int> s;
+        for (int n : nums2) {
+            while (!s.empty() && s.top() < n) {
+                m[s.top()] = n;
+                s.pop();
+            }
+            s.push(n);
+        }
+        vector<int> res;
+        for (int n : nums1) {
+            res.push_back(m.count(n) ? m[n] : -1);
+        }
+        return res;
+    }
+};
