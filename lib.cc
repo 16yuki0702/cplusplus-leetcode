@@ -8057,3 +8057,193 @@ public:
         return res;
     }
 };
+
+// 498. Diagonal Traverse
+class Solution {
+public:
+    vector<int> findDiagonalOrder(vector<vector<int>>& mat) {
+        int m = mat.size();
+        int n = mat[0].size();
+        vector<int> res;
+        for (int s = 0; s <= m + n - 2; s++) {
+            for (int x = 0; x <= s; x++) {
+                int i = x;
+                int j = s - i;
+                if (s % 2 == 0) {
+                    swap(i, j);
+                }
+                if (i >= m || j >= n) {
+                    continue;
+                }
+                res.push_back(mat[i][j]);
+            }
+        }
+        return res;
+    }
+};
+
+// 500. Keyboard Row
+class Solution {
+public:
+    vector<string> findWords(vector<string>& words) {
+        vector<int> dict(26);
+        vector<string> rows = {"QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"};
+        for (int i = 0; i < rows.size(); i++) {
+            for (auto c : rows[i]) {
+                dict[c - 'A'] = 1 << i;
+            }
+        }
+        vector<string> res;
+        for (auto w : words) {
+            int r = 7;
+            for (char c : w) {
+                r &= dict[toupper(c) - 'A'];
+                if (r == 0) {
+                    break;
+                }
+            }
+            if (r) {
+                res.push_back(w);
+            }
+        }
+        return res;
+    }
+};
+
+// 501. Find Mode in Binary Search Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+private:
+    int max = 0, cur = 0, pre = INT_MIN;
+public:
+    vector<int> findMode(TreeNode* root) {
+        vector<int> res;
+        recursive(root, res);
+        return res;
+    }
+    void recursive(TreeNode* r, vector<int>& res) {
+        if (!r) {
+            return;
+        }
+        recursive(r->left, res);
+        if (pre == r->val) {
+            cur++;
+        } else {
+            cur = 1;
+        }
+        if (cur > max) {
+            res.clear();
+            max = cur;
+            res.push_back(r->val);
+        } else if (cur == max) {
+            res.push_back(r->val);
+        }
+        pre = r->val;
+        recursive(r->right, res);
+    }
+};
+
+// 504. Base 7
+class Solution {
+public:
+    string convertToBase7(int num) {
+        int x = abs(num);
+        string res;
+        do {
+            res = to_string(x % 7) + res;
+        } while (x /= 7);
+        return (num >= 0 ? "" : "-") + res;
+    }
+};
+
+// 506. Relative Ranks
+class Solution {
+public:
+    vector<string> findRelativeRanks(vector<int>& score) {
+        vector<int> c = score;
+        qSort(c, 0, c.size() - 1);
+        unordered_map<int, int> rank;
+        for (int i = 0; i < c.size(); i++) {
+            rank[c[i]] = i + 1;
+        }
+        vector<string> res;
+        for (int i = 0; i < score.size(); i++) {
+            int v = score[i];
+            if (rank[v] == 1) {
+                res.push_back("Gold Medal");
+            } else if (rank[v] == 2) {
+                res.push_back("Silver Medal");
+            } else if (rank[v] == 3) {
+                res.push_back("Bronze Medal");
+            } else {
+                res.push_back(to_string(rank[v]));
+            }
+        }
+        return res;
+    }
+    void qSort(vector<int>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(v[(left + right) / 2], v[right]);
+        for (int i = left; i < right; i++) {
+            if (v[i] > v[right]) {
+                swap(v[p++], v[i]);
+            }
+        }
+        swap(v[p], v[right]);
+        qSort(v, left, p - 1);
+        qSort(v, p + 1, right);
+    }
+};
+
+// 508. Most Frequent Subtree Sum
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> findFrequentTreeSum(TreeNode* root) {
+        unordered_map<int, int> m;
+        vector<int> res;
+        recursive(m, root);
+        int max = 0;
+        for (auto v : m) {
+            if (v.second < max) {
+                continue;
+            } else if (v.second > max) {
+                res.clear();
+                max = v.second;
+            }
+            res.push_back(v.first);
+        }
+        return res;
+    }
+    int recursive(unordered_map<int, int>& m, TreeNode* root) {
+        if (!root) {
+            return 0;
+        }
+        int sum = root->val + recursive(m, root->left) + recursive(m, root->right);
+        m[sum]++;
+        return sum;
+    }
+};
