@@ -8263,3 +8263,262 @@ public:
         return dp[n];
     }
 };
+
+// 513. Find Bottom Left Tree Value
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int findBottomLeftValue(TreeNode* root) {
+        int res = root->val, max = 0;
+        recursive(root, 1, max, res);
+        return res;
+    }
+    void recursive(TreeNode* r, int depth, int& max, int& res) {
+        if (r == nullptr) {
+            return;
+        }
+        if (r->left && depth > max) {
+            max = depth, res = r->left->val;
+        } else if (r->right && depth > max) {
+            max = depth, res = r->right->val;
+        }
+        recursive(r->left, depth + 1, max, res);
+        recursive(r->right, depth + 1, max, res);
+    }
+};
+
+// 515. Find Largest Value in Each Tree Row
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> largestValues(TreeNode* root) {
+        vector<int> res;
+        recursive(root, 1, res);
+        return res;
+    }
+    void recursive(TreeNode* r, int level, vector<int>& res) {
+        if (r == nullptr) {
+            return;
+        }
+        if (res.size() < level) {
+            res.push_back(INT_MIN);
+        }
+        res[level - 1] = r->val > res[level - 1] ? r->val : res[level - 1];
+        recursive(r->left, level + 1, res);
+        recursive(r->right, level + 1, res);
+    }
+};
+
+// 516. Longest Palindromic Subsequence
+class Solution {
+public:
+    int longestPalindromeSubseq(string s) {
+        int n = s.length();
+        string t = s;
+        reverse(t.begin(), t.end());
+        int dp[n + 1][n + 1];
+        for (int i = 0; i <= n; i++) {
+            dp[i][0] = 0;
+            dp[0][i] = 0;
+        }
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (s[i - 1] == t[j - 1]) {
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[n][n];
+    }
+};
+
+// 518. Coin Change 2
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        int dp[5001] = {1};
+        for (auto c : coins) {
+            for (auto i = c; i <= amount; i++) {
+                dp[i] += dp[i - c];
+            }
+        }
+        return dp[amount];
+    }
+};
+
+// 520. Detect Capital
+class Solution {
+public:
+    bool detectCapitalUse(string word) {
+        for (int i = 1; i < word.size(); i++) {
+            if ((isUpper(word[1]) != isUpper(word[i])) ||
+                (!isUpper(word[0]) && isUpper(word[i]))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool isUpper(char c) {
+        return 'A' <= c && c <= 'Z';
+    }
+};
+
+// 525. Contiguous Array
+class Solution {
+public:
+    int findMaxLength(vector<int>& nums) {
+        unordered_map<int, int> m;
+        m[0] = -1;
+        int sum = 0, res = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            sum += nums[i] == 0 ? -1 : 1;
+            if (m.find(sum) != m.end()) {
+                if (res < i - m[sum]) {
+                    res = i - m[sum];
+                }
+            } else {
+                m[sum] = i;
+            }
+        }
+        return res;
+    }
+};
+
+// 530. Minimum Absolute Difference in BST
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int getMinimumDifference(TreeNode* root) {
+        int prev = INT_MAX, res = INT_MAX;
+        recursive(root, prev, res);
+        return res;
+    }
+    void recursive(TreeNode* r, int& prev, int& res) {
+        if (r == nullptr) {
+            return;
+        }
+        recursive(r->left, prev, res);
+        res = min(res, abs(r->val - prev));
+        prev = r->val;
+        recursive(r->right, prev, res);
+    }
+};
+
+// 532. K-diff Pairs in an Array
+class Solution {
+public:
+    int findPairs(vector<int>& nums, int k) {
+        unordered_map<int, int> m;
+        for (auto n : nums) {
+            m[n]++;
+        }
+        int res = 0;
+        for (auto v : m) {
+            if (k == 0) {
+                if (v.second > 1) {
+                    res++;
+                }
+            } else {
+                if (m.find(v.first + k) != m.end()) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+// 535. Encode and Decode TinyURL
+class Solution {
+private:
+    unordered_map<string, string> ltos;
+    unordered_map<string, string> stol;
+    uint64_t hash(const string& s) {
+        uint64_t h = 0x811c9dc5;
+        uint64_t p = 0x1000193;
+        for (int i = 0; i < s.size(); i++) {
+            uint8_t v = s[i];
+            h = h ^ v;
+            h *= p;
+        }
+        return h;
+    }
+public:
+
+    // Encodes a URL to a shortened URL.
+    string encode(string longUrl) {
+        ltos[longUrl] = "http://tinyurl.com/" + to_string(hash(longUrl));
+        stol[ltos[longUrl]] = longUrl;
+        return ltos[longUrl];
+    }
+
+    // Decodes a shortened URL to its original URL.
+    string decode(string shortUrl) {
+        return stol[shortUrl];
+    }
+};
+// Your Solution object will be instantiated and called as such:
+// Solution solution;
+// solution.decode(solution.encode(url));
+
+// 538. Convert BST to Greater Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* convertBST(TreeNode* root) {
+        int sum = 0;
+        recursive(root, sum);
+        return root;
+    }
+    void recursive(TreeNode* r, int& sum) {
+        if (r == nullptr) {
+            return;
+        }
+        recursive(r->right, sum);
+        sum += r->val;
+        r->val = sum;
+        recursive(r->left, sum);
+    }
+};
