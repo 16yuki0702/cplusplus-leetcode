@@ -8567,3 +8567,159 @@ public:
         return s;
     }
 };
+
+// 542. 01 Matrix
+class Solution {
+private:
+    vector<vector<int>> dir = {{1, 0}, {0, 1}, {0, -1}, {-1, 0}};
+public:
+    vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+        queue<pair<int, int>> q;
+        int m = mat.size();
+        int n = mat[0].size();
+        vector<vector<int>> res(m, vector<int>(n, - 1));
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (mat[i][j] == 0) {
+                    q.push({i, j});
+                    res[i][j] = 0;
+                }
+            }
+        }
+        while (!q.empty()) {
+            pair<int, int> cur = q.front();
+            q.pop();
+            for (auto& x: dir) {
+                int a = cur.first + x[0];
+                int b = cur.second + x[1];
+                if (isValid(a, b, m, n) && res[a][b] == -1) {
+                    q.push({a, b});
+                    res[a][b] = res[cur.first][cur.second] + 1;
+                }
+            }
+        }
+        return res;
+    }
+    bool isValid(int i, int j, int m, int n) {
+        if (i == m || j == n || j < 0 || i < 0) {
+            return false;
+        }
+        return true;
+    }
+};
+
+// 543. Diameter of Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        int res = 0;
+        recursive(root, res);
+        return res;
+    }
+    int recursive(TreeNode* root, int& res) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int l = recursive(root->left, res);
+        int r = recursive(root->right, res);
+        res = max(res, l + r);
+        return 1 + max(l, r);
+    }
+};
+
+// 551. Student Attendance Record I
+class Solution {
+public:
+    bool checkRecord(string s) {
+        int a = 0, l = 0;
+        for (char c : s) {
+            a = (c == 'A') ? a + 1 : a;
+            l = (c == 'L') ? l + 1 : 0;
+            if (l >= 3) {
+                return false;
+            }
+        }
+        return a < 2;
+    }
+};
+
+// 557. Reverse Words in a String III
+class Solution {
+public:
+    string reverseWords(string s) {
+        int i = 0, j = 0;
+        while (j <= s.size()) {
+            if (s[j] == ' ' || j == s.size()) {
+                int t = j--;
+                while (i < j) {
+                    swap(s[i++], s[j--]);
+                }
+                i = j = t + 1;
+            } else {
+                j++;
+            }
+        }
+        return s;
+    }
+};
+
+// 559. Maximum Depth of N-ary Tree
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+class Solution {
+public:
+    int maxDepth(Node* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int depth = 0;
+        for (auto c : root->children) {
+            depth = max(depth, (maxDepth(c)));
+        }
+        return 1 + depth;
+    }
+};
+
+// 560. Subarray Sum Equals K
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        int count = 0, sum = 0;
+        unordered_map<int, int> m;
+        m[0] = 1;
+        for (int i = 0; i < nums.size(); i++) {
+            sum += nums[i];
+            count += m[sum - k];
+            m[sum]++;
+        }
+        return count;
+    }
+};
