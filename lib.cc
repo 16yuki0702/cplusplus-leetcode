@@ -8723,3 +8723,282 @@ public:
         return count;
     }
 };
+
+// 561. Array Partition
+class Solution {
+public:
+    int arrayPairSum(vector<int>& nums) {
+        qSort(nums, 0, nums.size() - 1);
+        int res = 0;
+        for (int i = 0; i < nums.size(); i += 2) {
+            res += nums[i];
+        }
+        return res;
+    }
+    void qSort(vector<int>& n, int l, int r) {
+        if (l >= r) {
+            return;
+        }
+        int p = l;
+        swap(n[(l + r) / 2], n[r]);
+        for (int i = l; i < r; i++) {
+            if (n[i] < n[r]) {
+                swap(n[i], n[p++]);
+            }
+        }
+        swap(n[p], n[r]);
+        qSort(n, l, p - 1);
+        qSort(n, p + 1, r);
+    }
+};
+
+// 563. Binary Tree Tilt
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int findTilt(TreeNode* root) {
+        int res = 0;
+        recursive(root, res);
+        return res;
+    }
+    int recursive(TreeNode* root, int& res) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int left = recursive(root->left, res);
+        int right = recursive(root->right, res);
+        res += abs(left - right);
+        return left + right + root->val;
+    }
+};
+
+// 565. Array Nesting
+class Solution {
+public:
+    int arrayNesting(vector<int>& nums) {
+        int res = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            int tmp = 0, curr = i, prev = 0;
+            while (nums[curr] != -1) {
+                prev = curr;
+                curr = nums[curr];
+                nums[prev] = -1;
+                tmp++;
+            }
+            res = max(res, tmp);
+        }
+        return res;
+    }
+};
+
+// 566. Reshape the Matrix
+class Solution {
+public:
+    vector<vector<int>> matrixReshape(vector<vector<int>>& mat, int r, int c) {
+        int m = mat.size(), n = mat[0].size();
+        if (m * n != r * c) {
+            return mat;
+        }
+        vector<vector<int>> res(r, vector<int>(c, 0));
+        int k = 0, l = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (l >= c) {
+                    k++, l = 0;
+                }
+                res[k][l++] = mat[i][j];
+            }
+        }
+        return res;
+    }
+};
+
+// 567. Permutation in String
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+        int m[26] = {0};
+        for (char c : s1) {
+            m[c - 'a']++;
+        }
+        int i = 0, j = 0, count = s1.size();
+        while (j < s2.size()) {
+            if (m[s2.at(j++) - 'a']-- > 0) {
+                count--;
+            }
+            if (count == 0) {
+                return true;
+            }
+            if (j - i == s1.size() && m[s2.at(i++) - 'a']++ >= 0) {
+                count++;
+            }
+        }
+        return false;
+    }
+};
+
+// 572. Subtree of Another Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if (root == nullptr) {
+            return false;
+        }
+        bool res = false;
+        if (root->val == subRoot->val) {
+            res = compare(root, subRoot);
+        }
+        return res ? res : isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
+    }
+    bool compare(TreeNode* t1, TreeNode* t2) {
+        if (t1 == nullptr && t2 == nullptr) {
+            return true;
+        }
+        if ((t1 == nullptr || t2 == nullptr) || t1->val != t2->val) {
+            return false;
+        }
+        return compare(t1->left, t2->left) && compare(t1->right, t2->right);
+    }
+};
+
+// 575. Distribute Candies
+class Solution {
+public:
+    int distributeCandies(vector<int>& candyType) {
+        int limit = candyType.size() / 2, types = 0;
+        set<int> s;
+        for (auto c : candyType) {
+            s.insert(c);
+        }
+        if (s.size() <= limit) {
+            return s.size();
+        } else {
+            return limit;
+        }
+    }
+};
+/*
+one-liner solution
+int distributeCandies(vector<int>& c) {
+    return min(unordered_set<int>(begin(c), end(c)).size(), c.size() / 2);
+}
+*/
+
+// 581. Shortest Unsorted Continuous Subarray
+class Solution {
+public:
+    int findUnsortedSubarray(vector<int>& nums) {
+        int start = -1, end = -1, m = INT_MIN;
+        for (int i = 0; i < nums.size(); i++) {
+            if (m > nums[i]) {
+                if (start == - 1) {
+                    start = i - 1;
+                }
+                while (start - 1 >= 0 && nums[start - 1] > nums[i]) {
+                    start--;
+                }
+                end = i + 1;
+            } else {
+                m = nums[i];
+            }
+        }
+        return end - start;
+    }
+};
+
+// 589. N-ary Tree Preorder Traversal
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+class Solution {
+public:
+    vector<int> preorder(Node* root) {
+        if (!root) {
+            return {};
+        }
+        vector<int> res;
+        collect(root, res);
+        return res;
+    }
+    void collect(Node* root, vector<int>& res) {
+        res.push_back(root->val);
+        for (auto r : root->children) {
+            collect(r, res);
+        }
+    }
+};
+
+// 590. N-ary Tree Postorder Traversal
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+class Solution {
+public:
+    vector<int> postorder(Node* root) {
+        if (!root) {
+            return {};
+        }
+        vector<int> res;
+        collect(root, res);
+        return res;
+    }
+    void collect(Node* root, vector<int>& res) {
+        for (auto r : root->children) {
+            collect(r, res);
+        }
+        res.push_back(root->val);
+    }
+};
