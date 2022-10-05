@@ -9002,3 +9002,235 @@ public:
         res.push_back(root->val);
     }
 };
+
+// 594. Longest Harmonious Subsequence
+class Solution {
+public:
+    int findLHS(vector<int>& nums) {
+        unordered_map<int, int> m;
+        for (auto n : nums) {
+            m[n]++;
+        }
+        int res = 0;
+        for (auto [k, v] : m) {
+            if (m.find(k + 1) != m.end()) {
+                res = max(res, v + m[k + 1]);
+            }
+        }
+        return res;
+    }
+};
+
+// 599. Minimum Index Sum of Two Lists
+class Solution {
+public:
+    vector<string> findRestaurant(vector<string>& list1, vector<string>& list2) {
+        unordered_map<string, int> m;
+        for (int i = 0; i < list1.size(); i++) {
+            m[list1[i]] = i;
+        }
+        vector<string> res;
+        int less_index = INT_MAX;
+        for (int i = 0; i < list2.size(); i++) {
+            if (m.find(list2[i]) == m.end()) {
+                continue;
+            }
+            if (i + m[list2[i]] < less_index) {
+                less_index = i + m[list2[i]];
+                res.clear();
+                res.push_back(list2[i]);
+            } else if (i + m[list2[i]] == less_index) {
+                res.push_back(list2[i]);
+            }
+        }
+        return res;
+    }
+};
+
+// 605. Can Place Flowers
+class Solution {
+public:
+    bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+        flowerbed.insert(flowerbed.begin(), 0);
+        flowerbed.push_back(0);
+        for (int i = 1; i < flowerbed.size() - 1; i++) {
+            if (flowerbed[i - 1] + flowerbed[i] + flowerbed[i + 1] == 0) {
+                n--, i++;
+            }
+        }
+        return n <= 0;
+    }
+};
+
+// 606. Construct String from Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    string tree2str(TreeNode* root) {
+        string res = "";
+        recursive(root, res);
+        return res;
+    }
+    void recursive(TreeNode* r, string& res) {
+        if (!r) {
+            return;
+        }
+        res += to_string(r->val);
+        if (!r->left && !r->right) {
+            return;
+        }
+        res += "(";
+        recursive(r->left, res);
+        res += ")";
+        if (r->right) {
+            res += "(";
+            recursive(r->right, res);
+            res += ")";
+        }
+    }
+};
+
+// 617. Merge Two Binary Trees
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) {
+        if (!root1) {
+            return root2;
+        } else if (!root2) {
+            return root1;
+        }
+        root1->val += root2->val;
+        root1->left = mergeTrees(root1->left, root2->left);
+        root1->right = mergeTrees(root1->right, root2->right);
+        return root1;
+    }
+};
+
+// 622. Design Circular Queue
+class MyCircularQueue {
+private:
+    vector<int> q;
+    int k;
+    int f;
+    int r;
+    int count;
+public:
+    MyCircularQueue(int k) {
+        this->q = vector<int>(k, 0);
+        this->k = k;
+        this->f = 0;
+        this->r = 0;
+        this->count = 0;
+    }
+
+    bool enQueue(int value) {
+        if (isFull()) {
+            return false;
+        }
+        if (this->r == this->k) {
+            this->r = 0;
+        }
+        this->q[this->r++] = value;
+        this->count++;
+        return true;
+    }
+
+    bool deQueue() {
+        if (isEmpty()) {
+            return false;
+        }
+        if (++this->f == this->k) {
+            this->f = 0;
+        }
+        this->count--;
+        return true;
+    }
+
+    int Front() {
+        if (isEmpty()) {
+            return -1;
+        }
+        return this->q[this->f];
+    }
+
+    int Rear() {
+        if (isEmpty()) {
+            return -1;
+        }
+        if (this->r == 0) {
+            return this->q[this->k - 1];
+        }
+        return this->q[this->r - 1];
+    }
+
+    bool isEmpty() {
+        return this->count == 0;
+    }
+
+    bool isFull() {
+        return this->count == this->k;
+    }
+};
+/**
+ * Your MyCircularQueue object will be instantiated and called as such:
+ * MyCircularQueue* obj = new MyCircularQueue(k);
+ * bool param_1 = obj->enQueue(value);
+ * bool param_2 = obj->deQueue();
+ * int param_3 = obj->Front();
+ * int param_4 = obj->Rear();
+ * bool param_5 = obj->isEmpty();
+ * bool param_6 = obj->isFull();
+ */
+
+// 623. Add One Row to Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* addOneRow(TreeNode* root, int val, int depth) {
+        if (depth == 1) {
+            return new TreeNode(val, root, nullptr);
+        } else if (depth == 2) {
+            root->left = new TreeNode(val, root->left, nullptr);
+            root->right = new TreeNode(val, nullptr, root->right);
+        } else {
+            if (root->left) {
+                addOneRow(root->left, val, depth - 1);
+            }
+            if (root->right) {
+                addOneRow(root->right, val, depth - 1);
+            }
+        }
+        return root;
+    }
+};
