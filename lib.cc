@@ -9234,3 +9234,212 @@ public:
         return root;
     }
 };
+
+// 628. Maximum Product of Three Numbers
+class Solution {
+public:
+    int maximumProduct(vector<int>& nums) {
+        int last = nums.size() - 1;
+        qSort(nums, 0, last);
+        int left = nums[0] * nums[1] * nums[last];
+        int right = nums[last] * nums[last - 1] * nums[last - 2];
+        return left > right ? left : right;
+    }
+    void qSort(vector<int>& v, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int p = left;
+        swap(v[(left + right) / 2], v[right]);
+        for (int i = left; i < right; i++) {
+            if (v[right] > v[i]) {
+                swap(v[p++], v[i]);
+            }
+        }
+        swap(v[p], v[right]);
+        qSort(v, left, p - 1);
+        qSort(v, p + 1, right);
+    }
+};
+
+// 633. Sum of Square Numbers
+class Solution {
+public:
+    bool judgeSquareSum(int c) {
+        long left = 0, right = sqrt(c);
+        while (left <= right) {
+            long t = left * left + right * right;
+            if (t < c) {
+                left++;
+            } else if (t > c) {
+                right--;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// 637. Average of Levels in Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<double> averageOfLevels(TreeNode* root) {
+        queue<TreeNode*> q;
+        vector<double> res;
+        q.push(root);
+        while (!q.empty()) {
+            double tmp = 0;
+            int q_size = q.size();
+            for (int i = 0; i < q_size; i++) {
+                TreeNode* t = q.front();
+                q.pop();
+                tmp += t->val;
+                if (t->left) {
+                    q.push(t->left);
+                }
+                if (t->right) {
+                    q.push(t->right);
+                }
+            }
+            res.push_back(tmp / q_size);
+        }
+        return res;
+    }
+};
+
+// 641. Design Circular Deque
+class MyCircularDeque {
+private:
+    vector<int> q;
+    int size;
+    int count;
+    int front;
+    int rear;
+public:
+    MyCircularDeque(int k) {
+        q = vector<int>(k, 0);
+        size = k;
+        count = 0;
+        front = 0;
+        rear = 0;
+    }
+
+    bool insertFront(int value) {
+        if (isFull()) {
+            return false;
+        }
+        if (front == rear && count == 0) {
+            rear++;
+        }
+        q[front--] = value;
+        if (front < 0) {
+            front = size - 1;
+        }
+        count++;
+        return true;
+    }
+
+    bool insertLast(int value) {
+        if (isFull()) {
+            return false;
+        }
+        q[rear++] = value;
+        if (rear == size) {
+            rear = 0;
+        }
+        count++;
+        return true;
+    }
+
+    bool deleteFront() {
+        if (isEmpty()) {
+            return false;
+        }
+        if (++front == size) {
+            front = 0;
+        }
+        count--;
+        return true;
+    }
+
+    bool deleteLast() {
+        if (isEmpty()) {
+            return false;
+        }
+        if (--rear < 0) {
+            rear = size - 1;
+        }
+        count--;
+        return true;
+    }
+
+    int getFront() {
+        if (isEmpty()) {
+            return - 1;
+        }
+        if (front == size - 1) {
+            return q[0];
+        }
+        return q[front + 1];
+    }
+
+    int getRear() {
+        if (isEmpty()) {
+            return - 1;
+        }
+        if (rear == 0) {
+            return q[size - 1];
+        }
+        return q[rear - 1];
+    }
+
+    bool isEmpty() {
+        return count == 0;
+    }
+
+    bool isFull() {
+        return count == size;
+    }
+};
+/**
+ * Your MyCircularDeque object will be instantiated and called as such:
+ * MyCircularDeque* obj = new MyCircularDeque(k);
+ * bool param_1 = obj->insertFront(value);
+ * bool param_2 = obj->insertLast(value);
+ * bool param_3 = obj->deleteFront();
+ * bool param_4 = obj->deleteLast();
+ * int param_5 = obj->getFront();
+ * int param_6 = obj->getRear();
+ * bool param_7 = obj->isEmpty();
+ * bool param_8 = obj->isFull();
+ */
+
+// 643. Maximum Average Subarray I
+class Solution {
+public:
+    double findMaxAverage(vector<int>& nums, int k) {
+        double res = INT_MIN, sum = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            if (i < k) {
+                sum += nums[i];
+            } else {
+                res = max(res, sum);
+                sum = (sum + nums[i] - nums[i - k]);
+            }
+        }
+        res = max(res, sum);
+        return res / k;
+    }
+};
