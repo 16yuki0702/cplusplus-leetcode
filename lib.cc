@@ -62,6 +62,22 @@ public:
         return res;
     }
 };
+// map solution
+// class Solution {
+// public:
+//     int lengthOfLongestSubstring(string s) {
+//         unordered_map<char, int> m;
+//         int res = 0, start = -1;
+//         for (int i = 0; i < s.size(); i++) {
+//             if (m.find(s[i]) != m.end() && m[s[i]] > start) {
+//                 start = m[s[i]];
+//             }
+//             m[s[i]] = i;
+//             res = max(res, i - start);
+//         }
+//         return res;
+//     }
+// };
 
 // 4. Median of Two Sorted Arrays
 class Solution {
@@ -9443,3 +9459,208 @@ public:
         return res / k;
     }
 };
+
+// 645. Set Mismatch
+class Solution {
+public:
+    vector<int> findErrorNums(vector<int>& nums) {
+        int n = nums.size(), sum = n * (n + 1) / 2;
+        vector<int> res(2);
+        vector<bool> seen(n + 1);
+        for (int num : nums) {
+            sum -= num;
+            if (seen[num]) {
+                res[0] = num;
+            }
+            seen[num] = true;
+        }
+        res[1] = sum + res[0];
+        return res;
+    }
+};
+
+// 648. Replace Words
+class trie {
+private:
+    bool isRoot = false;
+    trie* t[26] = {};
+public:
+    void insert(string& word, int c, int s) {
+        isRoot |= c == s;
+        if (!isRoot) {
+            if (t[word[c] - 'a'] == nullptr) {
+                t[word[c] - 'a'] = new trie();
+            }
+            t[word[c] - 'a']->insert(word, c + 1, s);
+        }
+    }
+    int root(string& word, int st, int c, int s) {
+        if (st + c == s || word[st + c] == ' ' || this->isRoot) {
+            return c;
+        }
+        if (t[word[st + c] - 'a'] == nullptr) {
+            while (st + c < s && word[st + c] != ' ') {
+                c++;
+            }
+            return c;
+        }
+        return t[word[st + c] - 'a']->root(word, st, c + 1, s);
+    }
+};
+
+class Solution {
+public:
+    string replaceWords(vector<string>& dictionary, string sentence) {
+        trie t;
+        string res;
+        for (auto s : dictionary) {
+            t.insert(s, 0, s.size());
+        }
+        for (int i = 0; i < sentence.size(); ) {
+            if (sentence[i] == ' ') {
+                res += sentence[i++];
+            }
+            auto chars = t.root(sentence, i, 0, sentence.size());
+            res += sentence.substr(i, chars);
+            for (i += chars; i < sentence.size() && sentence[i] != ' '; i++);
+        }
+        return res;
+    }
+};
+
+// 650. 2 Keys Keyboard
+class Solution {
+public:
+    int minSteps(int n) {
+        if (n == 1) {
+            return 0;
+        }
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) {
+                return i + minSteps(n / i);
+            }
+        }
+        return n;
+    }
+};
+
+// 652. Find Duplicate Subtrees
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+        unordered_map<string, int> m;
+        vector<TreeNode*> res;
+        dfs(root, res, m);
+        return res;
+    }
+    string dfs(TreeNode* r, vector<TreeNode*>& res, unordered_map<string, int>& m) {
+        if (!r) {
+            return "";
+        }
+        string s = to_string(r->val) + "," + dfs(r->left, res, m) + "," + dfs(r->right, res, m);
+        if (m[s]++ == 1) {
+            res.push_back(r);
+        }
+        return s;
+    }
+};
+
+// 653. Two Sum IV - Input is a BST
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool findTarget(TreeNode* root, int k) {
+        unordered_map<int, int> m;
+        return recursive(root, m, k);
+    }
+    bool recursive(TreeNode* r, unordered_map<int, int>& m, int k) {
+        if (!r) {
+            return false;
+        }
+        if (m[k - r->val] >= 1) {
+            return true;
+        }
+        m[r->val]++;
+        return recursive(r->left, m, k) || recursive(r->right, m, k);
+    }
+};
+
+// 654. Maximum Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* constructMaximumBinaryTree(vector<int>& nums) {
+        return build(nums, 0, nums.size());
+    }
+    TreeNode* build(vector<int>& nums, int left, int right) {
+        if (left >= right) {
+            return nullptr;
+        }
+        int maxi = maxIdx(nums, left, right);
+        TreeNode* t = new TreeNode(nums[maxi]);
+        t->left = build(nums, left, maxi);
+        t->right = build(nums, maxi + 1, right);
+        return t;
+    }
+    int maxIdx(vector<int>& nums, int left, int right) {
+        int max = -1, maxi = -1;
+        for (int i = left; i < right; i++) {
+            if (nums[i] > max) {
+                max = nums[i], maxi = i;
+            }
+        }
+        return maxi;
+    }
+};
+// below is the beautiful stack solution!
+// https://leetcode.com/problems/maximum-binary-tree/discuss/106146/C%2B%2B-O(N)-solution
+// class Solution {
+// public:
+//     TreeNode* constructMaximumBinaryTree(vector<int>& nums) {
+//         vector<TreeNode*> stack;
+//         for (int i = 0; i < nums.size(); i++) {
+//             TreeNode* curr = new TreeNode(nums[i]);
+//             while (!stack.empty() && stack.back()->val < curr->val) {
+//                 curr->left = stack.back();
+//                 stack.pop_back();
+//             }
+//             if (!stack.empty()) {
+//                 stack.back()->right = curr;
+//             }
+//             stack.push_back(curr);
+//         }
+//         return stack.front();
+//     }
+// };
+
