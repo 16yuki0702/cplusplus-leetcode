@@ -9693,3 +9693,60 @@ public:
         return trimBST(root->left, low, high);
     }
 };
+
+// 670. Maximum Swap
+class Solution {
+public:
+    int maximumSwap(int num) {
+        string n = to_string(num);
+        unordered_map<int, int> last;
+        for (int i = 0; i < n.size(); i++) {
+            last[n[i] - '0'] = i;
+        }
+        for (int i = 0; i < n.size(); i++) {
+            for (int j = 9; j > n[i] - '0'; j--) {
+                if (last[j] > i) {
+                    swap(n[last[j]], n[i]);
+                    return stoi(n);
+                }
+            }
+        }
+        return stoi(n);
+    }
+};
+
+// 671. Second Minimum Node In a Binary Tree
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int findSecondMinimumValue(TreeNode* root) {
+        return recursive(root, root->val);
+    }
+    int recursive(TreeNode* r, int f) {
+        if (!r) {
+            return -1;
+        }
+        if (r->val != f) {
+            return r->val;
+        }
+        int left = recursive(r->left, f);
+        int right = recursive(r->right, f);
+        if (left == -1) {
+            return right;
+        }
+        if (right == -1) {
+            return left;
+        }
+        return min(left, right);
+    }
+};
