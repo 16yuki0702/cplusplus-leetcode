@@ -9750,3 +9750,309 @@ public:
         return min(left, right);
     }
 };
+
+// 673. Number of Longest Increasing Subsequence
+class Solution {
+public:
+    int findNumberOfLIS(vector<int>& nums) {
+        int n = nums.size(), res = 0, m = 0;
+        vector<pair<int, int>> dp(n, {1, 1});
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    if (dp[i].first == dp[j].first + 1) {
+                        dp[i].second += dp[j].second;
+                    }
+                    if (dp[i].first < dp[j].first + 1) {
+                        dp[i] = {dp[j].first + 1, dp[j].second};
+                    }
+                }
+            }
+            if (m == dp[i].first) {
+                res += dp[i].second;
+            }
+            if (m < dp[i].first) {
+                m = dp[i].first;
+                res = dp[i].second;
+            }
+        }
+        return res;
+    }
+};
+
+// 674. Longest Continuous Increasing Subsequence
+class Solution {
+public:
+    int findLengthOfLCIS(vector<int>& nums) {
+        int res = 1, tmp = 1;
+        for (int i = 1; i < nums.size(); i++) {
+            if (nums[i - 1] < nums[i]) {
+                tmp++;
+            } else {
+                res = max(res, tmp);
+                tmp = 1;
+            }
+        }
+        return max(res, tmp);
+    }
+};
+
+// 676. Implement Magic Dictionary
+struct T {
+    bool end;
+    T* c[26];
+    T () {
+        end = false;
+        memset(c, 0, sizeof(c));
+    }
+};
+
+class MagicDictionary {
+public:
+    T* root;
+    MagicDictionary() {
+        root = new T();
+    }
+
+    void buildDict(vector<string> dictionary) {
+        int n = dictionary.size();
+        for (int i = 0; i < n; i++) {
+            T* node = root;
+            string word = dictionary[i];
+            for (int j = 0; j < word.size(); j++) {
+                if (!node->c[dictionary[i][j] - 'a']) {
+                    node->c[dictionary[i][j] - 'a'] = new T();
+                }
+                node = node->c[dictionary[i][j] - 'a'];
+            }
+            node->end = true;
+        }
+    }
+
+    bool search(string searchWord) {
+        int n = searchWord.size();
+        string word = searchWord;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0;j < 26; j++) {
+                if ('a' + j == searchWord[i]) {
+                    continue;
+                }
+                word[i] = 'a' + j;
+                if (helper(word)) {
+                    return true;
+                }
+                word[i] = searchWord[i];
+            }
+        }
+        return false;
+    }
+
+    bool helper(string word) {
+        T* node = root;
+        int n = word.size();
+        for (int i = 0; i < n; i++) {
+            if (!node->c[word[i] -  'a']) {
+                return false;
+            }
+            node = node->c[word[i] - 'a'];
+        }
+        return node->end;
+    }
+};
+/**
+ * Your MagicDictionary object will be instantiated and called as such:
+ * MagicDictionary* obj = new MagicDictionary();
+ * obj->buildDict(dictionary);
+ * bool param_2 = obj->search(searchWord);
+ */
+
+// 677. Map Sum Pairs
+struct trie {
+    int val;
+    trie* c[26];
+    trie() {
+        val = 0;
+        memset(c, 0, sizeof(c));
+    }
+};
+
+class MapSum {
+private:
+    trie* m;
+public:
+    MapSum() {
+        m = new trie();
+    }
+
+    void insert(string key, int val) {
+        trie* t = m;
+        for (char c : key) {
+            if (!t->c[c - 'a']) {
+                t->c[c - 'a'] = new trie();
+            }
+            t = t->c[c - 'a'];
+        }
+        t->val = val;
+    }
+
+    int sum(string prefix) {
+        trie* curr = m;
+        int res = 0;
+        for (char c : prefix) {
+            if (!curr->c[c - 'a']) {
+                return res;
+            }
+            curr = curr->c[c - 'a'];
+        }
+        dfs(curr, res);
+        return res;
+    }
+
+    void dfs(trie* curr, int &sum) {
+        if (!curr) {
+            return;
+        }
+        sum += curr->val;
+        for (auto a : curr->c) {
+            dfs(a, sum);
+        }
+    }
+};
+/**
+ * Your MapSum object will be instantiated and called as such:
+ * MapSum* obj = new MapSum();
+ * obj->insert(key,val);
+ * int param_2 = obj->sum(prefix);
+ */
+
+// 678. Valid Parenthesis String
+class Solution {
+public:
+    bool checkValidString(string s) {
+        int cmin = 0, cmax = 0;
+        for (char c : s) {
+            if (c == '(') {
+                cmin++, cmax++;
+            } else if (c == ')') {
+                cmin--, cmax--;
+            } else {
+                cmin--, cmax++;
+            }
+            if (cmax < 0) {
+                return false;
+            }
+            cmin = max(cmin, 0);
+        }
+        return cmin == 0;
+    }
+};
+
+// 680. Valid Palindrome II
+class Solution {
+public:
+    bool validPalindrome(string s) {
+        return palindrome(s, 0, s.size() - 1, 0);
+    }
+
+    bool palindrome(string s, int left, int right, int count) {
+        if (count > 1) {
+            return false;
+        }
+        while (left < right) {
+            if (s[left] == s[right]) {
+                left++, right--;
+                continue;
+            }
+            return palindrome(s, left + 1, right, count + 1) ||
+                palindrome(s, left, right - 1, count + 1);
+        }
+        return true;
+    }
+};
+
+// 684. Redundant Connection
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        vector<int> p(edges.size() + 1, 0);
+        for (int i = 0; i < p.size(); i++) {
+            p[i] = i;
+        }
+        vector<int> res;
+        for (auto v : edges) {
+            int n1 = v[0], n2 = v[1];
+            while (n1 != p[n1]) {
+                n1 = p[n1];
+            }
+            while (n2 != p[n2]) {
+                n2 = p[n2];
+            }
+            if (n1 == n2) {
+                res = v;
+            } else {
+                p[n1] = n2;
+            }
+        }
+        return res;
+    }
+};
+
+// 687. Longest Univalue Path
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int longestUnivaluePath(TreeNode* root) {
+        int res = 0;
+        if (root) {
+            recursive(root, res);
+        }
+        return res;
+    }
+    int recursive(TreeNode* r, int& res) {
+        int left = r->left ? recursive(r->left, res) : 0;
+        int right = r->right ? recursive(r->right, res) : 0;
+        int sum_left = r->left && r->left->val == r->val ? left + 1 : 0;
+        int sum_right = r->right && r->right->val == r->val ? right + 1 : 0;
+        res = max(res, sum_left + sum_right);
+        return max(sum_left, sum_right);
+    }
+};
+
+// 690. Employee Importance
+/*
+// Definition for Employee.
+class Employee {
+public:
+    int id;
+    int importance;
+    vector<int> subordinates;
+};
+*/
+class Solution {
+public:
+    int getImportance(vector<Employee*> employees, int id) {
+        unordered_map<int, Employee*> m;
+        for (auto e : employees) {
+            m[e->id] = e;
+        }
+        int res = 0;
+        recursive(m, res, id);
+        return res;
+    }
+    void recursive(unordered_map<int, Employee*>& m, int& res, int id) {
+        res += m[id]->importance;
+        for (auto i : m[id]->subordinates) {
+            recursive(m, res, i);
+        }
+    }
+};
