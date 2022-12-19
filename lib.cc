@@ -10056,3 +10056,134 @@ public:
         }
     }
 };
+
+// 692. Top K Frequent Words
+class Solution {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k) {
+        map<string, int> m;
+        for (auto& w : words) {
+            m[w]++;
+        }
+        vector<vector<string>> bucket(words.size());
+        for (auto it : m) {
+            bucket[it.second].push_back(it.first);
+        }
+        vector<string> res;
+        for (int i = bucket.size() - 1; k > 0 && i >= 0; i--) {
+            if (bucket[i].empty()) {
+                continue;
+            }
+            int n = k > bucket[i].size() ? bucket[i].size() : k;
+            res.insert(res.end(), bucket[i].begin(), bucket[i].begin() + n);
+            k -= n;
+        }
+        return res;
+    }
+};
+
+// 693. Binary Number with Alternating Bits
+class Solution {
+public:
+    bool hasAlternatingBits(int n) {
+        int d = n & 1;
+        while ((n & 1) == d) {
+            d = 1 - d;
+            n >>= 1;
+        }
+        return n == 0;
+    }
+};
+
+// 695. Max Area of Island
+class Solution {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int res = 0;
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                if (grid[i][j] == 1) {
+                    int tmp = 0;
+                    count(grid, i, j, tmp);
+                    res = max(res, tmp);
+                }
+            }
+        }
+        return res;
+    }
+    void count(vector<vector<int>>& g, int r, int c, int& res) {
+        if (r < 0 || g.size() <= r || c < 0 || g[0].size() <= c) {
+            return;
+        }
+        if (g[r][c] != 1) {
+            return;
+        }
+        res++;
+        g[r][c] = 0;
+        count(g, r - 1, c, res);
+        count(g, r + 1, c, res);
+        count(g, r, c - 1, res);
+        count(g, r, c + 1, res);
+    }
+};
+
+// 696. Count Binary Substrings
+class Solution {
+public:
+    int countBinarySubstrings(string s) {
+        int res = 0;
+        for (int i = 0, j = 0; i < s.size(); j = i) {
+            int a = 0, b = 0;
+            while (j < s.size() && s[i] == s[j]) {
+                j++, a++;
+            }
+            i = j;
+            while (j < s.size() && s[i] == s[j]) {
+                j++, b++;
+            }
+            res += min(a, b);
+        }
+        return res;
+    }
+};
+
+// 698. Partition to K Equal Sum Subsets
+class Solution {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k) {
+        if (k > nums.size()) {
+            return false;
+        }
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum % k) {
+            return false;
+        }
+        vector<int> bucket(k, 0);
+        sort(nums.begin(), nums.end(), greater<int>());
+        return backtrack(nums, bucket, 0, sum / k);
+    }
+    bool backtrack(vector<int>& nums, vector<int>& bucket, int index, int target) {
+        if (index == nums.size()) {
+            for (int b : bucket) {
+                if (b != target) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        for (int i = 0; i < bucket.size(); i++) {
+            if (bucket[i] + nums[index] > target) {
+                continue;
+            }
+            bucket[i] += nums[index];
+            if (backtrack(nums, bucket, index + 1, target)) {
+                return true;
+            }
+            bucket[i] -= nums[index];
+            if (bucket[i] == 0) {
+                break;
+            }
+        }
+        return false;
+    }
+};
