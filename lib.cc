@@ -10187,3 +10187,170 @@ public:
         return false;
     }
 };
+
+// 713. Subarray Product Less Than K
+class Solution {
+public:
+    int numSubarrayProductLessThanK(vector<int>& nums, int k) {
+        if (k == 0) {
+            return 0;
+        }
+        int res = 0, tmp = 1;
+        for (int i = 0, j = 0; j < nums.size(); j++) {
+            tmp *= nums[j];
+            while (i <= j && tmp >= k) {
+                tmp /= nums[i++];
+            }
+            res += j - i + 1;
+        }
+        return res;
+    }
+};
+
+// 714. Best Time to Buy and Sell Stock with Transaction Fee
+class Solution {
+public:
+    int maxProfit(vector<int>& prices, int fee) {
+        int s1 = 0, s2 = INT_MIN;
+        for (int p : prices) {
+            int tmp = s1;
+            s1 = max(s1, s2 + p);
+            s2 = max(s2, tmp - p - fee);
+        }
+        return s1;
+    }
+};
+
+// 717. 1-bit and 2-bit Characters
+class Solution {
+public:
+    bool isOneBitCharacter(vector<int>& bits) {
+        int c1 = 0;
+        for (int i = bits.size() - 2; i >= 0 && bits[i] == 1; i--) {
+            c1++;
+        }
+        return c1 % 2 == 0;
+    }
+};
+
+// 720. Longest Word in Dictionary
+class Solution {
+public:
+    struct Trie {
+        Trie* child[26];
+        bool isLeaf;
+    };
+    Trie* createTrie() {
+        Trie* t = new Trie();
+        for (int i = 0; i < 26; i++) {
+            t->child[i] = nullptr;
+        }
+        t->isLeaf = false;
+        return t;
+    }
+    void insertTrie(Trie* t, string w) {
+        int i = 0, c = 0;
+        while (w[i] != '\0') {
+            c = w[i] - 'a';
+            if (t->child[c] == nullptr) {
+                t->child[c] = createTrie();
+            }
+            t = t->child[c];
+            i++;
+        }
+        t->isLeaf = true;
+    }
+    bool searchTrie(Trie* t, string& s) {
+        int c = 0;
+        for (int i = 0; i < s.size(); i++) {
+            c = s[i] - 'a';
+            if (t->child[c] == nullptr || !t->child[c]->isLeaf) {
+                return false;
+            }
+            t = t->child[c];
+        }
+        return t->isLeaf;
+    }
+    string longestWord(vector<string>& words) {
+        Trie* t = createTrie();
+        vector<vector<int>> lenTrack(31);
+        int maxLen = INT_MIN, len = 0;
+        for (int i = 0; i < words.size(); i++) {
+            insertTrie(t, words[i]);
+            len = words[i].size();
+            lenTrack[len].push_back(i);
+            maxLen = max(maxLen, len);
+        }
+        int res = -1, index = 0;
+        for (int i = maxLen; i >= 1; i--) {
+            for (int j = 0; j < lenTrack[i].size(); j++) {
+                index = lenTrack[i][j];
+                if (searchTrie(t, words[index])) {
+                    if (res == -1 || lexicographical_compare(
+                        words[index].begin(),
+                        words[index].end(),
+                        words[res].begin(),
+                        words[res].end())) {
+                            res = index;
+                    }
+                }
+            }
+            if (res != -1) {
+                return words[res];
+            }
+        }
+        return "";
+    }
+};
+
+// 722. Remove Comments
+class Solution {
+public:
+    vector<string> removeComments(vector<string>& source) {
+        vector<string> res;
+        string s;
+        bool isc = false;
+        for (int i = 0; i < source.size(); i++) {
+            for (int j = 0; j < source[i].size(); j++) {
+                if (!isc && j + 1 < source[i].size()
+                    && source[i][j] == '/'
+                    && source[i][j + 1] == '/') {
+                        break;
+                } else if (!isc && j + 1 < source[i].size()
+                    && source[i][j] == '/'
+                    && source[i][j + 1] == '*') {
+                    isc = true, j++;
+                } else if (isc && j + 1 < source[i].size()
+                    && source[i][j] == '*'
+                    && source[i][j + 1] == '/') {
+                    isc = false, j++;
+                } else if (!isc) {
+                    s.push_back(source[i][j]);
+                }
+            }
+            if (!isc && s.size()) {
+                res.push_back(s);
+                s.clear();
+            }
+        }
+        return res;
+    }
+};
+
+// 724. Find Pivot Index
+class Solution {
+public:
+    int pivotIndex(vector<int>& nums) {
+        int total = 0;
+        for (auto n : nums) {
+            total += n;
+        }
+        int tmp = 0;
+        for (int i = 0; i < nums.size(); tmp += nums[i++]) {
+            if (tmp * 2 == total - nums[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+};
