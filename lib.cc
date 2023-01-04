@@ -10354,3 +10354,129 @@ public:
         return -1;
     }
 };
+
+// 725. Split Linked List in Parts
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    vector<ListNode*> splitListToParts(ListNode* head, int k) {
+        vector<ListNode*> res(k, nullptr);
+        int size = 0;
+        for (ListNode* h = head; h; h = h->next) {
+            size++;
+        }
+        int n = size / k, r = size % k;
+        ListNode* curr = head, *prev = nullptr;
+        for (int i = 0; curr && i < k; i++, r--) {
+            res[i] = curr;
+            for (int j = 0; j < n + (r > 0); j++) {
+                prev = curr;
+                curr = curr->next;
+            }
+            prev->next = nullptr;
+        }
+        return res;
+    }
+};
+
+// 728. Self Dividing Numbers
+class Solution {
+public:
+    vector<int> selfDividingNumbers(int left, int right) {
+        vector<int> res;
+        for (int i = left, n = 0; i <= right; i++) {
+            for (n = i; n > 0; n /= 10) {
+                if (!(n % 10) || i % (n % 10)) {
+                    break;
+                }
+            }
+            if (!n) {
+                res.push_back(i);
+            }
+        }
+        return res;
+    }
+};
+
+// 729. My Calendar I
+class MyCalendar {
+    vector<pair<int, int>> m;
+public:
+    MyCalendar() {}
+    bool book(int start, int end) {
+        for (auto p : m) {
+            if (max(start, p.first) < min(end, p.second)) {
+                return false;
+            }
+        }
+        m.push_back(make_pair(start, end));
+        return true;
+    }
+};
+/**
+ * Your MyCalendar object will be instantiated and called as such:
+ * MyCalendar* obj = new MyCalendar();
+ * bool param_1 = obj->book(start,end);
+ */
+
+// 731. My Calendar II
+class MyCalendarTwo {
+    map<int, int> m;
+public:
+    MyCalendarTwo() {}
+    bool book(int start, int end) {
+        m[start]++, m[end]--;
+        if (add(2)) {
+            return true;
+        } else {
+            m[start]--, m[end]++;
+            return false;
+        }
+    }
+    bool add(int n) {
+        int count = 0;
+        for (auto e : m) {
+            count += e.second;
+            if (count > n) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+/**
+ * Your MyCalendarTwo object will be instantiated and called as such:
+ * MyCalendarTwo* obj = new MyCalendarTwo();
+ * bool param_1 = obj->book(start,end);
+ */
+
+// 733. Flood Fill
+class Solution {
+public:
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
+        flood(image, sr, sc, color, image[sr][sc]);
+        return image;
+    }
+    void flood(vector<vector<int>>& image, int sr, int sc, int color, int target) {
+        if (sr < 0 || image.size() <= sr || sc < 0 || image[0].size() <= sc) {
+            return;
+        }
+        if (image[sr][sc] != target || image[sr][sc] == color) {
+            return;
+        }
+        image[sr][sc] = color;
+        flood(image, sr + 1, sc, color, target);
+        flood(image, sr - 1, sc, color, target);
+        flood(image, sr, sc + 1, color, target);
+        flood(image, sr, sc - 1, color, target);
+    }
+};
