@@ -10548,3 +10548,47 @@ public:
         return letters[left] > target ? letters[left] : letters[0];
     }
 };
+
+// 745. Prefix and Suffix Search
+class WordFilter {
+    unordered_map<string, int> m;
+public:
+    WordFilter(vector<string>& words) {
+        for (int k = 0; k < words.size(); k++) {
+            string const& word = words[k];
+            int const n = word.size();
+            for (int i = 1; i <= n; i++) {
+                string key = word.substr(0, i);
+                key += '.';
+                for (int j = 1; j <= n; j++) {
+                    key.resize(i + 1);
+                    key.append(word, n - j, j);
+                    m[key] = k;
+                }
+            }
+        }
+    }
+    int f(string prefix, string suffix) {
+        prefix += '.';
+        prefix += suffix;
+        return m.count(prefix) ? m[prefix] : -1;
+    }
+};
+
+// 747. Largest Number At Least Twice of Others
+class Solution {
+public:
+    int dominantIndex(vector<int>& nums) {
+        int m1 = -1, m2 = -1, mi = -1;
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] > m1) {
+                m2 = m1;
+                m1 = nums[i];
+                mi = i;
+            } else if (nums[i] > m2) {
+                m2 = nums[i];
+            }
+        }
+        return m2 * 2 <= m1 ? mi : -1;
+    }
+};
