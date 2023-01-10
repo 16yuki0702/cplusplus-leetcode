@@ -8401,6 +8401,14 @@ public:
     }
 };
 
+// 521. Longest Uncommon Subsequence I
+class Solution {
+public:
+    int findLUSlength(string a, string b) {
+        return a == b ? -1 : max(a.size(), b.size());
+    }
+};
+
 // 525. Contiguous Array
 class Solution {
 public:
@@ -9664,6 +9672,23 @@ public:
 //     }
 // };
 
+// 658. Find K Closest Elements
+class Solution {
+public:
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        int left = 0, right = arr.size() - k;
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (x - arr[mid] > arr[mid + k] - x) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return vector<int>(arr.begin() + left, arr.begin() + left + k);
+    }
+};
+
 // 669. Trim a Binary Search Tree
 /**
  * Definition for a binary tree node.
@@ -10590,5 +10615,37 @@ public:
             }
         }
         return m2 * 2 <= m1 ? mi : -1;
+    }
+};
+
+// 762. Prime Number of Set Bits in Binary Representation
+class Solution {
+public:
+    int countPrimeSetBits(int left, int right) {
+        int count = 0;
+        for (int i = left; i <= right; i++) {
+            int k = i, tmp = 0;
+            while (k != 0) {
+                if (k % 2 == 1) {
+                    tmp++;
+                }
+                k /= 2;
+            }
+            if (tmp == 1) {
+                continue;
+            }
+            if (isPrime(tmp)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    bool isPrime(int n) {
+        for (int i = 2; i <= sqrt(n); i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 };
