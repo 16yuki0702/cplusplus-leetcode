@@ -6538,6 +6538,57 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    vector<int> countBits(int n) {
+        vector<int> res(n + 1, 0);
+        for (int i = 1; i <= n; i++) {
+            res[i] = res[i >> 1] + i % 2;
+        }
+        return res;
+    }
+};
+In O(N) Time
+Let if we have X and Y in Such a way that,
+X/2 = Y
+then Number of set bits in X - Number of set bit in Y <= 1
+
+eg let X = 7and Y = 3
+then 7 / 2 = 3;
+
+7 -> 1 1 1 number of set bit are 3
+3 -> 0 1 1 number of set bit are 2
+
+there difference is 3 - 2 <= 1
+
+another eg
+X = 12 and y = 6
+then 12 / 2 = 6;
+
+12 -> 1100 number of set bit are 2
+6 -> 0110 number of set bit are 2
+
+there difference is 2 - 2 <= 1
+
+There can be 2 cases
+whether X is Odd or Even
+
+if X is ODD
+
+then the (LSB) Least Significant Bit will always be set and dividing by 2 means right shifting the number by 1 bit.
+so if last bit is set and right shift it by 1 bit than the last set bit will be lost.
+therfore the new number Y has 1 set bit less than in compare to X
+But if X is Even
+
+then LSB will be equal to 0, therefore even we do right shift by1 bit then only this 0 bit will be lost and no set bit got lost
+so When we have X has Even,
+
+no of set bit in X = no of set bit in Y
+and When X is ODD
+
+no of set bit in X = 1 + no of set bit in Y
+*/
 
 // 342. Power of Four
 class Solution {
@@ -6741,6 +6792,25 @@ public:
         return sum;
     }
 };
+/*
+Here, variable c is carry, and ans is return value. Denote ^ is xor operation.
+Proof: the loop invariant of the while loop above code is: if there is no carry in any ith bit of a + b exists,
+a ^ b must equal to a + b: let's consider a example: 2 in 2 base is 10,
+and 1 in 2 base is 01, there is no carry in any bit of (2 + 1), that's the time (2+1) = (2^1) exists.
+Otherwise, if we know a ^ b and carry for each bit of a + b, let's say c, then (a ^ b) + (c<<1) must equal to a + b;
+Here is an example: 3 in 2 base is 11, while 1 in 2 base is 01, obviously, carry is 01 corresponding to each bit,
+therefore, 3+1 = 3^1+(1<<1) holds (3^1 = 2, 1<<1 = 2).
+
+in the beginning, "c = a & b" and "c != 0" used to check if there is any carry for a + b exists: if not,
+then we got result directly (case 2 + 1), if there is any carry bit (case 3+1),
+then "c <<= 1" used to shift and "ans ^ c" used to calculate new "bit adding result",
+after new adding result is calculate, we have two situation: if the result is final result,
+then new carry must be zero, otherwise not (according to loop invariant);
+so carry is updated for each bit "c = ans & c". After above step,
+the ans keeps the xor result of ans and carry c,
+carry c holds the result of new carry for each bit of (previous ans + previous c<<1),
+till carry is gone, then ans holds final result.
+*/
 
 // 374. Guess Number Higher or Lower
 /**
