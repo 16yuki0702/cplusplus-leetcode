@@ -2456,6 +2456,39 @@ public:
         return cur;
     }
 };
+/*
+class Solution {
+public:
+    int numDecodings(string s) {
+        int n = s.size();
+        int dp[100];
+        memset(dp, -1 , sizeof(dp));
+        return decode(s, 0, n, dp);
+    }
+    int decode(string& s, int start, int end, int dp[]) {
+        if (start < end && s[start] == '0') {
+            return 0;
+        }
+        if (end <= start) {
+            return 1;
+        }
+        if (dp[start] != -1) {
+            return dp[start];
+        }
+        int res = 0;
+        // pick one
+        if (s[start] != '0') {
+            res = decode(s, start + 1, end, dp);
+        }
+        // pick double
+        if (start + 1 < end &&
+            ((s[start] == '1' && s[start + 1] <= '9') || (s[start] == '2' && s[start + 1] <= '6'))) {
+                res += decode(s, start + 2, end, dp);
+        }
+        return dp[start] = res;
+    }
+};
+*/
 
 // 92. Reverse Linked List II
 /**
@@ -3756,23 +3789,72 @@ public:
 class Solution {
 public:
     bool wordBreak(string s, vector<string>& wordDict) {
-        vector<bool> v(s.length() + 1, false);
+        vector<bool> v(s.size() + 1, false);
         v[0] = true;
         for (int i = 0; i < v.size(); i++) {
             if (!v[i]) {
                 continue;
             }
-            for (int j = 0; j < wordDict.size(); j++) {
-                string t = wordDict[j];
-                string sub = s.substr(i, t.length());
-                if (!t.compare(sub)) {
-                    v[i + t.length()] = true;
+            for (auto w : wordDict) {
+                string sub = s.substr(i, w.size());
+                if (!sub.compare(w)) {
+                    v[i + w.size()] = true;
                 }
             }
         }
-        return v[s.length()];
+        return v[s.size()];
     }
 };
+/*
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_map<string, bool> d;
+        unordered_map<string, bool> memo;
+        for (auto s : wordDict) {
+            d[s] = true;
+        }
+        return helper(s, d, memo);
+    }
+    bool helper(string s, unordered_map<string, bool>& d, unordered_map<string, bool>& memo) {
+        if (d.find(s) != d.end()) {
+            return true;
+        }
+        if (memo.find(s) != memo.end()) {
+            return memo[s];
+        }
+        for (int i = 0; i < s.size(); i++) {
+            string left = s.substr(0, i + 1);
+            string right = s.substr(i + 1);
+            if (d.find(left) != d.end()) {
+                if (helper(right, d, memo)) {
+                    memo[s] = true;
+                    return true;
+                }
+            }
+        }
+        memo[s] = false;
+        return false;
+    }
+};
+The idea is to find all possible prefixes and recurse the remaining part of the string.
+Memoize the function to avoid redundant calls.
+
+Catsandog - [cat, cats, sand, and, dog]
+C
+Ca
+Cat
+Left = Cat, Recurse(sandog)
+s
+sa
+san
+sand
+Left = sand, Recurse(og)
+o
+og
+return false
+Function falls on Left = Cats, Recurse(andog) ...
+*/
 
 // 140. Word Break II
 class Solution {
@@ -4580,6 +4662,23 @@ public:
         return cur;
     }
 };
+/*
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if (nums.size() == 1) {
+            return nums[0];
+        }
+        vector<int> dp(nums.size(), 0);
+        dp[0] = nums[0];
+        dp[1] = max(nums[0], nums[1]);
+        for (int i = 2; i < nums.size(); i++) {
+            dp[i] = max(nums[i] + dp[i - 2], dp[i - 1]);
+        }
+        return dp[nums.size() - 1];
+    }
+};
+*/
 
 // 199. Binary Tree Right Side View
 /**
@@ -4810,6 +4909,61 @@ public:
         return degrees;
     }
 };
+/*
+class Solution {
+    int WHITE = 0;
+    int GREY = 1;
+    int BLACK = 2;
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        // assuming prerequisites is [[1,0],[2,1],[3,2],[5,3],[4,5],[0,5]]
+        vector<vector<int>> graph(numCourses);
+        vector<int> visited(numCourses, WHITE);
+        // 1 → 0
+        // 2 → 1
+        // 3 → 2
+        // 5 → 3
+        // 4 → 5
+        // 0 → 5
+        for (int i = 0; i < prerequisites.size(); i++) {
+            graph[prerequisites[i][0]].push_back(prerequisites[i][1]);
+        }
+        for (int i = 0; i < numCourses; i++) {
+            if (visited[i] == WHITE) {
+                if (!dfs(i, graph, visited)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    bool dfs(int i, vector<vector<int>>& graph, vector<int>& visited) {
+        visited[i] = GREY;
+        // dfs : 0
+        // dfs : 0, graph : 5(0) -> (0 : WHITE, 1 : GREY, 2 : BLACK)
+        // dfs : 5
+        // dfs : 5, graph : 3(0) -> (0 : WHITE, 1 : GREY, 2 : BLACK)
+        // dfs : 3
+        // dfs : 3, graph : 2(0) -> (0 : WHITE, 1 : GREY, 2 : BLACK)
+        // dfs : 2
+        // dfs : 2, graph : 1(0) -> (0 : WHITE, 1 : GREY, 2 : BLACK)
+        // dfs : 1
+        // dfs : 1, graph : 0(1) -> (0 : WHITE, 1 : GREY, 2 : BLACK)
+        for (int j = 0; j < graph[i].size(); j++) {
+            if (visited[graph[i][j]] == GREY) {
+                return false;
+            }
+            if (visited[graph[i][j]] == WHITE) {
+                if (!dfs(graph[i][j], graph, visited)) {
+                    return false;
+                }
+            }
+        }
+        visited[i] = BLACK;
+        return true;
+    }
+};
+*/
 
 // 208. Implement Trie (Prefix Tree)
 class TrieNode {
@@ -5093,6 +5247,33 @@ public:
         return cur;
     }
 };
+/*
+// more understandable solution.
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if (nums.size() == 1) {
+            return nums[0];
+        } else if (nums.size() == 2) {
+            return max(nums[0], nums[1]);
+        }
+        int n = nums.size();
+        int dp1[n], dp2[n];
+
+        dp1[0] = nums[0];
+        dp1[1] = nums[0];
+
+        dp2[0] = 0;
+        dp2[1] = nums[1];
+
+        for (int i = 2; i < n; i++) {
+            dp1[i] = max(nums[i] + dp1[i - 2], dp1[i - 1]);
+            dp2[i] = max(nums[i] + dp2[i - 2], dp2[i - 1]);
+        }
+        return max(dp1[n - 2], dp2[n - 1]);
+    }
+};
+*/
 
 // 215. Kth Largest Element in an Array
 class Solution {
@@ -10732,5 +10913,23 @@ public:
             }
         }
         return true;
+    }
+};
+
+// 1143. Longest Common Subsequence
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        vector<vector<int>> dp(text1.size() + 1, vector(text2.size() + 1, 0));
+        for (int i = 1; i <= text1.size(); i++) {
+            for (int j = 1; j <= text2.size(); j++) {
+                if (text1[i - 1] == text2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = max(dp[i][j - 1], dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[text1.size()][text2.size()];
     }
 };
