@@ -1566,6 +1566,49 @@ public:
         return res;
     }
 };
+/*
+Intuition
+The main idea of solving this problem is that when iterate over the intervals, there are three cases:
+
+the new interval's range is before the range of current interval.
+Example new interval= {3,4} and current interval= {6,9}
+
+the new interval is after the range of current interval.
+Example new interval= {5,7} and current interval= {2,3}
+
+the new interval range overlaps with the range of current interval.
+Example interval= {5,9} and new interval= {6,11}
+
+Approach
+Simple iterate through intervals.
+
+If case 1 occurs,ie. The new interval's range is before the current interval, so we can insert the new interval into answer and update new interval to the current interval.
+If case 2 occurs,ie. The new interval is after the range of current interval, so we can simply insert the current interval into answer.
+If case 3 occurs,ie. The new interval overlaps with current interval, so we update the first element of new interval to the minimum of current interval and new interval and update the second element of new interval to the maximum of current interval and new interval.
+Example interval= {5,9} and new interval= {6,11}. Then update new interval = {min(5,6),max(9,11)}={5,11}
+At the end of iterations simply insert new interval to the answer.
+Complexity
+Time complexity:O(n)
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        for (auto interval : intervals) {
+            if (newInterval[1] < interval[0]) { // case1
+                res.push_back(newInterval);
+                newInterval = interval;
+            } else if (interval[1] < newInterval[0]) { // case2
+                res.push_back(interval);
+            } else if (newInterval[1] <= interval[0] || interval[0] <= newInterval[1]) { // case3
+                newInterval[0] = min(interval[0], newInterval[0]);
+                newInterval[1] = max(interval[1], newInterval[1]);
+            }
+        }
+        res.push_back(newInterval);
+        return res;
+    }
+};
+*/
 
 // 58. Length of Last Word
 class Solution {
