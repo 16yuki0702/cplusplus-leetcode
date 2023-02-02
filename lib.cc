@@ -542,6 +542,28 @@ public:
         return dummy->next;
     }
 };
+/*
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode *fast = head, *slow = head;
+        while (n--) {
+            fast = fast->next;
+        }
+        if (!fast) {
+            return slow->next;
+        }
+        while (fast->next) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        ListNode *d = slow->next;
+        slow->next = slow->next->next;
+        delete d;
+        return head;
+    }
+};
+*/
 
 // 20. Valid Parentheses
 class Solution {
@@ -1546,6 +1568,29 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        vector<vector<int>> res;
+        sort(intervals.begin(), intervals.end());
+        vector<int> interval = intervals[0];
+        for (int i = 1; i < intervals.size(); i++) {
+            if (interval[1] < intervals[i][0]) {
+                res.push_back(interval);
+                interval = intervals[i];
+            } else if (intervals[i][1] < interval[0]) {
+                res.push_back(intervals[i]);
+            } else if (interval[1] <= intervals[i][0] || intervals[i][0] <= interval[1]) {
+                interval[0] = min(interval[0], intervals[i][0]);
+                interval[1] = max(interval[1], intervals[i][1]);
+            }
+        }
+        res.push_back(interval);
+        return res;
+    }
+};
+*/
 
 // 57. Insert Interval
 class Solution {
@@ -2562,6 +2607,21 @@ public:
         return dummy->next;
     }
 };
+/*
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        ListNode* prev = nullptr;
+        while (head) {
+            ListNode* next = head->next;
+            head->next = prev;
+            prev = head;
+            head = next;
+        }
+        return prev;
+    }
+};
+*/
 
 // 93. Restore IP Addresses
 class Solution {
@@ -4005,6 +4065,30 @@ public:
         l[right]->next = nullptr;
     }
 };
+/*
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        stack<ListNode*> s;
+        ListNode *tmp = head;
+        while (tmp) {
+            s.push(tmp);
+            tmp = tmp->next;
+        }
+        int count = s.size() / 2;
+        tmp = head;
+        while (count--) {
+            ListNode *next = tmp->next;
+            ListNode *top = s.top();
+            tmp->next = top;
+            top->next = next;
+            tmp = next;
+            s.pop();
+        }
+        tmp->next = nullptr;
+    }
+};
+*/
 
 // 144. Binary Tree Preorder Traversal
 /**
@@ -7711,6 +7795,52 @@ public:
         return res;
     }
 };
+/*
+https://leetcode.com/problems/longest-repeating-character-replacement/solutions/208284/c-sliding-window-with-detailed-explanation-and-thinking-process/?q=C%2B%2B&orderBy=most_votes
+
+If we want to replace the characters in a substring and make it into the longest repeating,
+then we definitely want to find the character with maximum frequency and then replace all the other characters
+by this one, hence in this way, we can minimize the number of replacement.
+Hence, with such idea within mind, when we build a sliding window [start, end],
+we want this window to have this property:
+(the length of the window) - (the maximum frequency of the character in this window) > k.
+Then we can see that [start, end-1] can be fit into k replacement.
+If we can find such a sliding window, then how to we move this window? We can simply shift the start to start+1,
+since in this way this window will no longer hold the property
+(the length of the window) - (the maximum frequency of the character in this window) > k,
+and then we can keep moving end to end+1 to see if we have a longer window.
+Below, we use localMaxFreq to record the maximum frequency seen so far in the current window.
+
+The above code uses localMaxFreq to keep track the maximum frequency of each current window.
+However, if we think carefully,
+we can find that if localMaxFreq of window A >= localMaxFreq of window B,
+then the A window must have longer length than the B window,
+this is because since both window A and window B hold this property
+(the length of the window) - (the maximum frequency of the character in this window) > k,
+and if localMaxFreq of window A >= localMaxFreq of window B,
+then (the length of the window A) >= (the length of the window B) by simple algebra.
+Hence, we only need to keep track of a globalMaxFreq
+to record the globally maximum frequency of each window what has been seen so far.
+
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        int res = 0, maxfreq = 0;
+        unordered_map<char, int> m;
+        int start = 0, end = 0;
+        for (; end < s.size(); end++) {
+            char c = s[end];
+            maxfreq = max(maxfreq, ++m[c]);
+            if (end - start - maxfreq + 1 > k) {
+                res = max(res, end - start);
+                m[s[start]]--;
+                start++;
+            }
+        }
+        return max(res, end - start);
+    }
+};
+*/
 
 // 429. N-ary Tree Level Order Traversal
 /*
@@ -7799,6 +7929,47 @@ public:
             }
         }
         return s.size() > 0 && s[s.size() - 1] != ' ' ? res + 1 : res;
+    }
+};
+
+// 435. Non-overlapping Intervals
+class Solution {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        int res = 0, left = 0, right = 1;
+        while (right < intervals.size()) {
+            // Case 1:
+            // ------------------   -----------------
+            // |   Interval 1   |   |   Interval 2  |
+            // ------------------   -----------------
+            if (intervals[left][1] <= intervals[right][0]) {
+                left = right;
+                right++;
+            // Case 2:
+            // ------------------
+            // |   Interval 1   |
+            // ------------------
+            //            ------------------
+            //            |    Interval 2  |
+            //            ------------------
+            } else if (intervals[left][1] <= intervals[right][1]) {
+                res++;
+                right++;
+            // Case 3:
+            // --------------------
+            // |    Interval 1    |
+            // --------------------
+            //    --------------
+            //    | Interval 2 |
+            //    --------------
+            } else if (intervals[right][1] < intervals[left][1]) {
+                res++;
+                left = right;
+                right++;
+            }
+        }
+        return res;
     }
 };
 
