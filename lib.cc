@@ -132,6 +132,33 @@ public:
         return max;
     }
 };
+/*
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.size() < 2) {
+            return s;
+        }
+        int n = s.size(), left = 0, right = 0;
+        int max_left = 0, res = 0;
+        for (int start = 0; start < n && n - start > res / 2; ) {
+            left = right = start;
+            while (right < n - 1 && s[right] == s[right + 1]) {
+                right++;
+            }
+            start = right + 1;
+            while (right < n - 1 && 0 < left && s[left - 1] == s[right + 1]) {
+                left--, right++;
+            }
+            if (res < right - left + 1) {
+                max_left = left;
+                res = right - left + 1;
+            }
+        }
+        return s.substr(max_left, res);
+    }
+};
+*/
 
 // 6. ZigZag Conversion
 class Solution {
@@ -1378,6 +1405,34 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, vector<string>> m;
+        for (string s : strs) {
+            string counting = countingSort(s);
+            m[counting].push_back(s);
+        }
+        vector<vector<string>> res;
+        for (auto [str, list] : m) {
+            res.push_back(list);
+        }
+        return res;
+    }
+    string countingSort(string s) {
+        int m[26] = {0};
+        string res;
+        for (char c : s) {
+            m[c - 'a']++;
+        }
+        for (int i : m) {
+            res += to_string(i) + '/';
+        }
+        return res;
+    }
+};
+*/
 
 // 50. Pow(x, n)
 class Solution {
@@ -2143,6 +2198,53 @@ public:
         return "";
     }
 };
+/*
+https://leetcode.com/problems/minimum-window-substring/solutions/1891931/sliding-window-approach-with-full-explanation-in-c/?q=C%2B%2B&orderBy=most_votes
+Here we’re storing all the characters from string t to an unordered_map mp.
+We are taking 3 variables, ans(to store the size of the minimum substring),
+start(to store the start index) & count(to store the map size, if it became 0 that means we got a substring)
+Now taking 2 pointers i & j, we’ll iterate using j & will decrement the element count in map.
+if at any point the value became 0 that means we got all the elements of that char till now,
+so we’ll decrement the size of the count.
+In this way, we will decrement and once the count will be 0 if there is a substring with all the elements present.
+Now we’ll increment i and check if there is possible to remove any more characters and get smaller substrings.
+We’ll store the smaller length to ans & store the ith index in the start variable.
+Also, we’ll add the element to our map and increment the count variable if it became greater than 0.
+Now if the ans have some length except int_max,
+then return the substring from start index to length of ans. Else return empty string.
+Time complexity: O(m), where m is the length of string s.
+
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> m;
+        for (auto tt : t) {
+            m[tt]++;
+        }
+        int unique_char_count = m.size();
+        int i = 0, j = 0, start = 0, res = INT_MAX;
+        while (j < s.size()) {
+            m[s[j]]--;
+            if (m[s[j]] == 0) {
+                unique_char_count--;
+            }
+            while (unique_char_count == 0) {
+                if (res > j - i + 1) {
+                    res = j - i + 1;
+                    start = i;
+                }
+                m[s[i]]++;
+                if (m[s[i]] > 0) {
+                    unique_char_count++;
+                }
+                i++;
+            }
+            j++;
+        }
+        return res == INT_MAX ? "" : s.substr(start, res);
+    }
+};
+*/
 
 // 77. Combinations
 class Solution {
@@ -2911,6 +3013,33 @@ public:
         traversal(res, root->right, level + 1);
     }
 };
+/*
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        queue<TreeNode*> q;
+        if (root) {
+            q.push(root);
+        }
+        while (!q.empty()) {
+            res.push_back(vector<int>());
+            for (int i = 0, n = q.size(); i < n; i++) {
+                TreeNode *node = q.front();
+                res.back().push_back(node->val);
+                q.pop();
+                if (node->left) {
+                    q.push(node->left);
+                }
+                if (node->right) {
+                    q.push(node->right);
+                }
+            }
+        }
+        return res;
+    }
+};
+*/
 
 // 103. Binary Tree Zigzag Level Order Traversal
 /**
@@ -6484,6 +6613,51 @@ public:
 // Your Codec object will be instantiated and called as such:
 // Codec ser, deser;
 // TreeNode* ans = deser.deserialize(ser.serialize(root));
+/*
+class Codec {
+public:
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (!root) {
+            return "null,";
+        }
+        return to_string(root->val) + ","
+            + serialize(root->left)
+            + serialize(root->right);
+    }
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        queue<string> q;
+        string s = "";
+        for (int i = 0; i < data.size(); i++) {
+            if (data[i] == ',') {
+                q.push(s);
+                s = "";
+            } else {
+                s += data[i];
+            }
+        }
+        if (s != "") {
+            q.push(s);
+        }
+        return helper(q);
+    }
+    TreeNode* helper(queue<string>& q) {
+        if (q.empty()) {
+            return nullptr;
+        }
+        string val = q.front();
+        q.pop();
+        if (val == "null") {
+            return nullptr;
+        }
+        TreeNode* n = new TreeNode(stoi(val));
+        n->left = helper(q);
+        n->right = helper(q);
+        return n;
+    }
+};
+*/
 
 // 300. Longest Increasing Subsequence
 class Solution {
