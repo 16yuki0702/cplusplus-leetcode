@@ -3139,6 +3139,30 @@ public:
         return r;
     }
 };
+/*
+https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/solutions/2279613/c-recursive-using-map-approaches/?q=c%EF%BC%8B%EF%BC%8B&orderBy=most_votes
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int i = 0;
+        return build(preorder, inorder, i, 0, inorder.size() - 1);
+    }
+    TreeNode* build(vector<int>& pre, vector<int>& in, int& i, int l, int r) {
+        if (l > r) {
+            return nullptr;
+        }
+        int p = l;
+        while (pre[i] != in[p]) {
+            p++;
+        }
+        i++;
+        TreeNode* n = new TreeNode(in[p]);
+        n->left = build(pre, in, i, l, p - 1);
+        n->right = build(pre, in, i, p + 1, r);
+        return n;
+    }
+};
+*/
 
 // 106. Construct Binary Tree from Inorder and Postorder Traversal
 /**
@@ -5481,6 +5505,68 @@ public:
          }
     }
 };
+/*
+class Solution {
+private:
+    class Trie {
+    public:
+        Trie *children[26];
+        string word;
+        Trie() {
+            for (int i = 0; i < 26; i++) {
+                this->children[i] = nullptr;
+            }
+        }
+    };
+public:
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        Trie *root = build(words);
+        vector<string> res;
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[0].size(); j++) {
+                dfs(board, i, j, root, res);
+            }
+        }
+        return res;
+    }
+    Trie* build(vector<string> &words) {
+        Trie *root = new Trie();
+        for (int i = 0; i < words.size(); i++) {
+            string word = words[i];
+            Trie *curr = root;
+            for (int j = 0; j < word.size(); j++) {
+                char c = word[j] - 'a';
+                if (curr->children[c] == nullptr) {
+                    curr->children[c] = new Trie();
+                }
+                curr = curr->children[c];
+            }
+            curr->word = word;
+        }
+        return root;
+    }
+    void dfs(vector<vector<char>>& board, int i, int j, Trie *t, vector<string> &res) {
+        if (i < 0 || board.size() <= i || j < 0 || board[0].size() <= j) {
+            return;
+        }
+        char c = board[i][j];
+        if (c == '#' || t->children[c - 'a'] == nullptr) {
+            return;
+        }
+        t = t->children[c - 'a'];
+        if (t->word.size() > 0) {
+            res.push_back(t->word);
+            t->word = "";
+        }
+        board[i][j] = '#';
+        dfs(board, i - 1, j, t, res);
+        dfs(board, i + 1, j, t, res);
+        dfs(board, i, j - 1, t, res);
+        dfs(board, i, j + 1, t, res);
+        board[i][j] = c;
+    }
+};
+*/
 
 // 213. House Robber II
 class Solution {
@@ -5951,6 +6037,26 @@ public:
         }
     }
 };
+/*
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        int res = 0;
+        dfs(root, k, res);
+        return res;
+    }
+    void dfs(TreeNode* r, int& k, int& res) {
+        if (!r) {
+            return;
+        }
+        dfs(r->left, k, res);
+        if (--k == 0) {
+            res = r->val;
+        }
+        dfs(r->right, k, res);
+    }
+};
+*/
 
 // 231. Power of Two
 class Solution {
@@ -6075,6 +6181,28 @@ public:
         return root;
     }
 };
+/*
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode* res;
+        dfs(root, p, q, &res);
+        return res;
+    }
+    bool dfs(TreeNode* r, TreeNode* p, TreeNode* q, TreeNode** res) {
+        if (!r) {
+            return false;
+        }
+        bool left = dfs(r->left, p, q, res);
+        bool right = dfs(r->right, p, q, res);
+        bool curr = (r == p || r == q);
+        if ((left && right) || (left && curr) || (right && curr)) {
+            *res = r;
+        }
+        return left || right || curr;
+    }
+};
+*/
 
 // 236. Lowest Common Ancestor of a Binary Tree
 /**
@@ -6327,6 +6455,31 @@ public:
         return sum;
     }
 };
+/*
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int sum1 = 0, sum2 = nums.size();
+        for (int i = 0; i < nums.size(); i++) {
+            sum1 += nums[i];
+            sum2 += i;
+        }
+        return sum2 - sum1;
+    }
+};
+
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int res = nums.size();
+        for (int i = 0; i < nums.size(); i++) {
+            res ^= nums[i];
+            res ^= i;
+        }
+        return res;
+    }
+};
+*/
 
 // 274. H-Index
 class Solution {
@@ -6561,6 +6714,30 @@ public:
  * obj->addNum(num);
  * double param_2 = obj->findMedian();
  */
+/*
+https://leetcode.com/problems/find-median-from-data-stream/solutions/1330646/c-java-python-minheap-maxheap-solution-picture-explain-clean-concise/?q=C&orderBy=most_votes
+class MedianFinder {
+    priority_queue<int, vector<int>, less<int>> maxHeap;
+    priority_queue<int, vector<int>, greater<int>> minHeap;
+public:
+    MedianFinder() {}
+    void addNum(int num) {
+        maxHeap.push(num);
+        minHeap.push(maxHeap.top());
+        maxHeap.pop();
+        if (minHeap.size() > maxHeap.size()) {
+            maxHeap.push(minHeap.top());
+            minHeap.pop();
+        }
+    }
+    double findMedian() {
+        if (maxHeap.size() > minHeap.size()) {
+            return maxHeap.top();
+        }
+        return (maxHeap.top() + minHeap.top()) / 2.0;
+    }
+};
+*/
 
 // 297. Serialize and Deserialize Binary Tree
 /**
@@ -7071,6 +7248,23 @@ and When X is ODD
 
 no of set bit in X = 1 + no of set bit in Y
 */
+/*
+another understandable solution
+class Solution {
+public:
+    vector<int> countBits(int n) {
+        vector<int> dp(n + 1, 0);
+        int offset = 1;
+        for (int i = 1; i <= n; i++) {
+            if (offset * 2 == i) {
+                offset = i;
+            }
+            dp[i] = 1 + dp[i - offset];
+        }
+        return dp;
+    }
+};
+*/
 
 // 342. Power of Four
 class Solution {
@@ -7162,6 +7356,36 @@ public:
         qSort(v, p + 1, right);
     }
 };
+/*
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        if (k == nums.size()) {
+            return nums;
+        }
+        unordered_map<int, int> m;
+        for (auto n : nums) {
+            m[n]++;
+        }
+        auto comp = [&m](int n1, int n2) {
+            return m[n1] > m[n2];
+        };
+        priority_queue<int, vector<int>, decltype(comp)> heap(comp);
+        for (pair<int, int> p : m) {
+            heap.push(p.first);
+            if (heap.size() > k) {
+                heap.pop();
+            }
+        }
+        vector<int> top(k);
+        for (int i = k - 1; i >= 0; i--) {
+            top[i] = heap.top();
+            heap.pop();
+        }
+        return top;
+    }
+};
+*/
 
 // 349. Intersection of Two Arrays
 class Solution {
@@ -7292,6 +7516,24 @@ so carry is updated for each bit "c = ans & c". After above step,
 the ans keeps the xor result of ans and carry c,
 carry c holds the result of new carry for each bit of (previous ans + previous c<<1),
 till carry is gone, then ans holds final result.
+*/
+/*
+
+how to handled left shift error with negative value on C++.
+
+https://leetcode.com/problems/sum-of-two-integers/solutions/302977/c-the-evil-runtime-error-left-shift-of-negative-value-reason-and-how-to-solve/?q=C%2B%2B&orderBy=most_votes
+
+class Solution {
+public:
+    int getSum(int a, int b) {
+        while (b != 0) {
+            int tmp = (unsigned int)(a & b) << 1;
+            a = a ^ b;
+            b = tmp;
+        }
+        return a;
+    }
+};
 */
 
 // 374. Guess Number Higher or Lower
@@ -9544,6 +9786,37 @@ public:
         return compare(t1->left, t2->left) && compare(t1->right, t2->right);
     }
 };
+/*
+class Solution {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if (root == nullptr || subRoot == nullptr) {
+            return false;
+        }
+        if (root->val != subRoot->val) {
+            return isSubtree(root->left, subRoot)
+                || isSubtree(root->right, subRoot);
+        }
+        return compare(root, subRoot)
+            || isSubtree(root->left, subRoot)
+            || isSubtree(root->right, subRoot);
+    }
+
+    bool compare(TreeNode* r, TreeNode* sub) {
+        if (r == nullptr && sub == nullptr) {
+            return true;
+        }
+        if (r == nullptr || sub == nullptr) {
+            return false;
+        }
+        if (r->val != sub->val) {
+            return false;
+        }
+        return compare(r->left, sub->left)
+            && compare(r->right, sub->right);
+    }
+};
+*/
 
 // 575. Distribute Candies
 class Solution {
@@ -11321,3 +11594,4 @@ public:
         return dp[text1.size()][text2.size()];
     }
 };
+// https://leetcode.com/problems/longest-common-subsequence/solutions/348884/c-with-picture-o-nm/?q=C%2B%2B&orderBy=most_votes
