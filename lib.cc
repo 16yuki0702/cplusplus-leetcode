@@ -2647,6 +2647,7 @@ public:
     }
 };
 /*
+// https://leetcode.com/problems/decode-ways/solutions/1411484/detailed-explanation-c-dp-with-memoization/?q=C%2B%2B&orderBy=most_votes
 class Solution {
 public:
     int numDecodings(string s) {
@@ -11574,6 +11575,50 @@ public:
             }
         }
         return true;
+    }
+};
+
+// 994. Rotting Oranges
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        int oranges = 0;
+        int r = grid.size(), c = grid[0].size();
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (grid[i][j] == 1) {
+                    oranges++;
+                }
+            }
+        }
+        queue<int> q;
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (grid[i][j] == 2) {
+                    q.push(i * c + j);
+                }
+            }
+        }
+        int minutes = 0;
+        vector<vector<int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        while (!q.empty() && oranges > 0) {
+            int qsize = q.size();
+            for (int i = 0; i < qsize; i++) {
+                int coordinate = q.front();
+                q.pop();
+                int x = coordinate / c, y = coordinate % c;
+                for (auto d : directions) {
+                    int tx = x + d[0], ty = y + d[1];
+                    if (-1 < tx && tx < r && -1 < ty && ty < c && grid[tx][ty] == 1) {
+                        q.push(tx * c + ty);
+                        oranges--;
+                        grid[tx][ty] = 2;
+                    }
+                }
+            }
+            minutes++;
+        }
+        return oranges == 0 ? minutes : -1;
     }
 };
 
