@@ -136,26 +136,27 @@ public:
 class Solution {
 public:
     string longestPalindrome(string s) {
-        if (s.size() < 2) {
-            return s;
+        int start_left = 0, max_len = 0;
+        int n = s.size(), l = 0, r = 0;
+        for (int i = 0; i < n && n - i > max_len / 2; ) {
+            l = r = i;
+            // skip duplicated characters.
+            while (r < n && s[r] == s[r + 1]) {
+                r++;
+            }
+            // hold next start postion.
+            i = r + 1;
+            // continue while it is palindrome.
+            while (r < n && 0 < l && s[l - 1] == s[r + 1]) {
+                l--, r++;
+            }
+            // calculate max substr length and its start position.
+            if (r - l + 1 > max_len) {
+                max_len = r - l + 1;
+                start_left = l;
+            }
         }
-        int n = s.size(), left = 0, right = 0;
-        int max_left = 0, res = 0;
-        for (int start = 0; start < n && n - start > res / 2; ) {
-            left = right = start;
-            while (right < n - 1 && s[right] == s[right + 1]) {
-                right++;
-            }
-            start = right + 1;
-            while (right < n - 1 && 0 < left && s[left - 1] == s[right + 1]) {
-                left--, right++;
-            }
-            if (res < right - left + 1) {
-                max_left = left;
-                res = right - left + 1;
-            }
-        }
-        return s.substr(max_left, res);
+        return s.substr(start_left, max_len);
     }
 };
 */
@@ -6203,6 +6204,23 @@ public:
         return left || right || curr;
     }
 };
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode *curr = root;
+        while (curr) {
+            if (p->val < curr->val && q->val < curr->val) {
+                curr = curr->left;
+            } else if (curr->val < p->val && curr->val < q->val) {
+                curr = curr->right;
+            } else {
+                return curr;
+            }
+        }
+        return curr;
+    }
+};
 */
 
 // 236. Lowest Common Ancestor of a Binary Tree
@@ -6796,31 +6814,30 @@ class Codec {
 public:
     // Encodes a tree to a single string.
     string serialize(TreeNode* root) {
+        string s = "";
         if (!root) {
             return "null,";
         }
-        return to_string(root->val) + ","
+        return to_string(root->val)
+            + ","
             + serialize(root->left)
             + serialize(root->right);
     }
     // Decodes your encoded data to tree.
     TreeNode* deserialize(string data) {
         queue<string> q;
-        string s = "";
-        for (int i = 0; i < data.size(); i++) {
-            if (data[i] == ',') {
-                q.push(s);
-                s = "";
+        string tmp = "";
+        for (auto c : data) {
+            if (c == ',') {
+                q.push(tmp);
+                tmp = "";
             } else {
-                s += data[i];
+                tmp += c;
             }
         }
-        if (s != "") {
-            q.push(s);
-        }
-        return helper(q);
+        return buildTree(q);
     }
-    TreeNode* helper(queue<string>& q) {
+    TreeNode *buildTree(queue<string>& q) {
         if (q.empty()) {
             return nullptr;
         }
@@ -6829,10 +6846,10 @@ public:
         if (val == "null") {
             return nullptr;
         }
-        TreeNode* n = new TreeNode(stoi(val));
-        n->left = helper(q);
-        n->right = helper(q);
-        return n;
+        TreeNode *r = new TreeNode(stoi(val));
+        r->left = buildTree(q);
+        r->right = buildTree(q);
+        return r;
     }
 };
 */
@@ -9817,6 +9834,42 @@ public:
             && compare(r->right, sub->right);
     }
 };
+
+class Solution {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            TreeNode *tmp = q.front();
+            q.pop();
+            if (tmp->val == subRoot->val) {
+                if (isSame(tmp, subRoot)) {
+                    return true;
+                }
+            }
+            if (tmp->left) {
+                q.push(tmp->left);
+            }
+            if (tmp->right) {
+                q.push(tmp->right);
+            }
+        }
+        return false;
+    }
+    bool isSame(TreeNode *r, TreeNode *sub) {
+        if (r == nullptr && sub == nullptr) {
+            return true;
+        }
+        if (r == nullptr || sub == nullptr) {
+            return false;
+        }
+        if (r->val != sub->val) {
+            return false;
+        }
+        return isSame(r->left, sub->left) && isSame(r->right, sub->right);
+    }
+};
 */
 
 // 575. Distribute Candies
@@ -10397,6 +10450,35 @@ public:
         }
         res[1] = sum + res[0];
         return res;
+    }
+};
+
+// 647. Palindromic Substrings
+// https://leetcode.com/problems/palindromic-substrings/solutions/631588/c-dp-with-video-link/?q=C%2B%2B&orderBy=most_votes
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int n = s.size(), count = 0;
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+        for (int i = 0; i < n; i++) {
+            // all single character is palindrome.
+            dp[i][i] = 1;
+            count++;
+        }
+        for (int c = 1; c < n; c++) {
+            for (int r = 0; r < c; r++) {
+                // substring length is 2.
+                if (r == c - 1 && s[r] == s[c]) {
+                    dp[r][c] = 1;
+                    count++;
+                // substring length is greater than 2.
+                } else if (dp[r + 1][c - 1] == 1 && s[r] == s[c]) {
+                    dp[r][c] = 1;
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 };
 
