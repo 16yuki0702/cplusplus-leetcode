@@ -159,6 +159,32 @@ public:
         return s.substr(start_left, max_len);
     }
 };
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string res = "";
+        for (int i = 0; i < s.size(); ) {
+            int right = i, left = i;
+            // skip duplicated character.
+            while (right + 1 < s.size() && s[right] == s[right + 1]) {
+                right++;
+            }
+            // next start position.
+            // because we already know skipped character is palidrome.
+            i = right + 1;
+            // while it's be palindrome.
+            while (1 <= left && right + 1 < s.size() && s[left - 1] == s[right + 1]) {
+                left--, right++;
+            }
+            // store result if it's longest palindrome.
+            if (res.size() < right - left + 1) {
+                res = s.substr(left, right - left + 1);
+            }
+        }
+        return res;
+    }
+};
 */
 
 // 6. ZigZag Conversion
@@ -7403,6 +7429,31 @@ public:
         return top;
     }
 };
+
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> m;
+        for (auto n : nums) {
+            m[n]++;
+        }
+        vector<vector<int>> bucket(nums.size() + 1, vector<int>());
+        for (auto [num, count] : m) {
+            bucket[count].push_back(num);
+        }
+        vector<int> res;
+        for (int i = bucket.size() - 1; i >= 0; i--) {
+            vector<int> v = bucket[i];
+            for (auto vv : v) {
+                res.push_back(vv);
+                if (res.size() == k) {
+                    return res;
+                }
+            }
+        }
+        return res;
+    }
+};
 */
 
 // 349. Intersection of Two Arrays
@@ -10481,6 +10532,27 @@ public:
         return count;
     }
 };
+/*
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int res = 0;
+        for (int i = 0; i < s.size(); i++) {
+            res += count(s, i, i);
+            res += count(s, i, i + 1);
+        }
+        return res;
+    }
+    int count(string& s, int left, int right) {
+        int count = 0;
+        while (0 <= left && right < s.size() && s[left] == s[right]) {
+            count++;
+            left--, right++;
+        }
+        return count;
+    }
+};
+*/
 
 // 648. Replace Words
 class trie {
