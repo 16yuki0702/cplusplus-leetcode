@@ -1348,6 +1348,28 @@ public:
         }
     }
 };
+/*
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        if (nums.size() == 1) {
+            return {nums};
+        }
+        vector<vector<int>> res;
+        for (int i = 0; i < nums.size(); i++) {
+            int n = nums[0];
+            nums.erase(nums.begin());
+            auto perms = permute(nums);
+            for (auto& p : perms) {
+                p.push_back(n);
+            }
+            res.insert(res.end(), perms.begin(), perms.end());
+            nums.push_back(n);
+        }
+        return res;
+    }
+};
+*/
 
 // 47. Permutations II
 class Solution {
@@ -8113,6 +8135,21 @@ public:
         return s.length();
     }
 };
+/*
+class Solution {
+public:
+    int longestPalindrome(string s) {
+        int oddCount = 0;
+        for (char c = 'a'; c <= 'z'; c++) {
+            oddCount += count(s.begin(), s.end(), c) & 1;
+        }
+        for (char c = 'A'; c <= 'Z'; c++) {
+            oddCount += count(s.begin(), s.end(), c) & 1;
+        }
+        return s.size() - oddCount + (oddCount > 0);
+    }
+};
+*/
 
 // 412. Fizz Buzz
 class Solution {
@@ -11729,6 +11766,52 @@ public:
             }
         }
         return true;
+    }
+};
+
+// 876. Middle of the Linked List
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* middleNode(ListNode* head) {
+        ListNode *slow = head, *fast = head;
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+};
+
+// 973. K Closest Points to Origin
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        priority_queue<pair<int, int>, vector<pair<int, int>>, less<pair<int, int>>> q;
+        for (int i = 0; i < points.size(); i++) {
+            int dist = points[i][0] * points[i][0] + points[i][1] * points[i][1];
+            if (q.size() < k) {
+                q.push({dist, i});
+            } else if (dist < q.top().first) {
+                q.push({dist, i});
+                q.pop();
+            }
+        }
+        vector<vector<int>> res;
+        while (!q.empty()) {
+            res.push_back(points[q.top().second]);
+            q.pop();
+        }
+        return res;
     }
 };
 
