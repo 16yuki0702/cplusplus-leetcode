@@ -1262,6 +1262,26 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int l = 0, r = height.size() - 1;
+        int maxl = height[0], maxr = height[r];
+        int res = 0;
+        while (l < r) {
+            if (maxl < maxr) {
+                maxl = max(maxl, height[++l]);
+                res += maxl - height[l];
+            } else {
+                maxr = max(maxr, height[--r]);
+                res += maxr - height[r];
+            }
+        }
+        return res;
+    }
+};
+*/
 
 // 43. Multiply Strings
 class Solution {
@@ -2213,6 +2233,23 @@ public:
         q_sort(nums, j + 1, right);
     }
 };
+/*
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int l = 0, m = 0, r = nums.size() - 1;
+        while (m <= r) {
+            if (nums[m] == 0) {
+                swap(nums[m++], nums[l++]);
+            } else if (nums[m] == 1) {
+                m++;
+            } else if (nums[m] == 2) {
+                swap(nums[m], nums[r--]);
+            }
+        }
+    }
+};
+*/
 
 // 76. Minimum Window Substring
 class Solution {
@@ -2335,6 +2372,24 @@ public:
         }
     }
 };
+/*
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> res;
+        backTrack(res, nums, {}, 0);
+        return res;
+    }
+    void backTrack(vector<vector<int>>& res, vector<int>& nums, vector<int> sub, int start) {
+        res.push_back(sub);
+        for (int i = start; i < nums.size(); i++) {
+            sub.push_back(nums[i]);
+            backTrack(res, nums, sub, i + 1);
+            sub.pop_back();
+        }
+    }
+};
+*/
 
 // 79. Word Search
 class Solution {
@@ -3797,6 +3852,42 @@ public:
     }
 };
 
+// 127. Word Ladder
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        set<string> s(wordList.begin(), wordList.end());
+        if (s.find(endWord) == s.end()) {
+            return 0;
+        }
+        queue<string> q;
+        q.push(beginWord);
+        int count = 0;
+        while (!q.empty()) {
+            count++;
+            for (int i = 0, n = q.size(); i < n; i++) {
+                string curr = q.front();
+                q.pop();
+                if (curr == endWord) {
+                    return count;
+                }
+                for (int j = 0; j < curr.size(); j++) {
+                    char tmp = curr[j];
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        curr[j] = c;
+                        if (s.find(curr) != s.end()) {
+                            q.push(curr);
+                            s.erase(curr);
+                        }
+                    }
+                    curr[j] = tmp;
+                }
+            }
+        }
+        return 0;
+    }
+};
+
 // 128. Longest Consecutive Sequence
 class Solution {
 public:
@@ -4486,6 +4577,78 @@ public:
  * int param_1 = obj->get(key);
  * obj->put(key,value);
  */
+/*
+class LRUCache {
+    class DoubleLinkedList {
+    public:
+        int k;
+        int v;
+        DoubleLinkedList* prev;
+        DoubleLinkedList* next;
+        DoubleLinkedList(int key, int val) {
+            this->k = key;
+            this->v = val;
+            this->prev = nullptr;
+            this->next = nullptr;
+        }
+    };
+public:
+    DoubleLinkedList *left;
+    DoubleLinkedList *right;
+    unordered_map<int, DoubleLinkedList*> m;
+    int cap;
+    LRUCache(int capacity) {
+        this->left = new DoubleLinkedList(-1, -1);
+        this->right = new DoubleLinkedList(-1, -1);
+        this->left->next = right;
+        this->right->prev = left;
+        this->cap = capacity;
+    }
+
+    void remove(DoubleLinkedList *l) {
+        DoubleLinkedList *p = l->prev;
+        DoubleLinkedList *n = l->next;
+        if (p && n) {
+            p->next = n;
+            n->prev = p;
+        }
+    }
+
+    void insert(DoubleLinkedList *l) {
+        DoubleLinkedList *p = this->right->prev;
+        p->next = l;
+        l->prev = p;
+
+        l->next = right;
+        right->prev = l;
+    }
+
+    int get(int key) {
+        if (this->m.find(key) == this->m.end()) {
+            return -1;
+        }
+        int res = this->m[key]->v;
+        remove(this->m[key]);
+        insert(this->m[key]);
+        return res;
+    }
+
+    void put(int key, int value) {
+        if (this->m.find(key) == this->m.end()) {
+            this->m[key] = new DoubleLinkedList(key, value);
+        }
+        this->m[key]->v = value;
+        remove(this->m[key]);
+        insert(this->m[key]);
+        if (this->m.size() > this->cap) {
+            DoubleLinkedList *leastUsed = this->left->next;
+            this->m.erase(leastUsed->k);
+            remove(leastUsed);
+            delete leastUsed;
+        }
+    }
+};
+*/
 
 // 147. Insertion Sort List
 /**
@@ -6594,6 +6757,23 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    int firstBadVersion(int n) {
+        int l = 1, r = n;
+        while (l <= r) {
+            int m = l + (r - l) / 2;
+            if (isBadVersion(m)) {
+                r = m - 1;
+            } else {
+                l = m + 1;
+            }
+        }
+        return l;
+    }
+};
+*/
 
 // 279. Perfect Squares
 class Solution {
@@ -8273,6 +8453,32 @@ public:
         return dp[sum / 2];
     }
 };
+/*
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum & 1) {
+            return false;
+        }
+        int target = sum / 2;
+        set<int> s;
+        for (int i = 0; i < nums.size(); i++) {
+            set<int> nset;
+            nset.insert(nums[i]);
+            for (auto& v : s) {
+                if (nums[i] == target || v + nums[i] == target) {
+                    return true;
+                }
+                nset.insert(v + nums[i]);
+                nset.insert(v);
+            }
+            s = nset;
+        }
+        return false;
+    }
+};
+*/
 
 // 419. Battleships in a Board
 class Solution {
@@ -8494,6 +8700,25 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        int res = 0;
+        int curr = intervals[0][1];
+        for (int i = 1; i < intervals.size(); i++) {
+            if (curr <= intervals[i][0]) {
+                curr = intervals[i][1];
+            } else {
+                curr = min(curr, intervals[i][1]);
+                res++;
+            }
+        }
+        return res;
+    }
+};
+*/
 
 // 437. Path Sum III
 /**
@@ -8524,6 +8749,35 @@ public:
         return (root->val == sum) +
             traverse(root->left, sum - root->val) +
             traverse(root->right, sum - root->val);
+    }
+};
+
+// 438. Find All Anagrams in a String
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        if (s.size() < p.size()) {
+            return {};
+        }
+        int plen = p.size();
+        vector<int> pfreq(26, 0);
+        vector<int> window(26, 0);
+        for (int i = 0; i < plen; i++) {
+            pfreq[p[i] - 'a']++;
+            window[s[i] - 'a']++;
+        }
+        vector<int> res;
+        if (pfreq == window) {
+            res.push_back(0);
+        }
+        for (int i = plen; i < s.size(); i++) {
+            window[s[i] - 'a']++;
+            window[s[i - plen] - 'a']--;
+            if (pfreq == window) {
+                res.push_back(i - plen + 1);
+            }
+        }
+        return res;
     }
 };
 
@@ -10205,6 +10459,40 @@ public:
     }
 };
 
+// 621. Task Scheduler
+class Solution {
+public:
+    int leastInterval(vector<char>& tasks, int n) {
+        int bucket[26] = {};
+        for (auto& c : tasks) {
+            bucket[c - 'A']++;
+        }
+        priority_queue<int, vector<int>, less<int>> maxHeap;
+        for (int i = 0; i < 26; i++) {
+            if (bucket[i] > 0) {
+                maxHeap.push(bucket[i]);
+            }
+        }
+        queue<pair<int, int>> q;
+        int time = 0;
+        while (!maxHeap.empty() || !q.empty()) {
+            time++;
+            if (!maxHeap.empty()) {
+                int taskCount = maxHeap.top();
+                maxHeap.pop();
+                if (--taskCount > 0) {
+                    q.push({taskCount, time + n});
+                }
+            }
+            if (!q.empty() && q.front().second <= time) {
+                maxHeap.push(q.front().first);
+                q.pop();
+            }
+        }
+        return time;
+    }
+};
+
 // 622. Design Circular Queue
 class MyCircularQueue {
 private:
@@ -11814,6 +12102,40 @@ public:
         return res;
     }
 };
+
+// 981. Time Based Key-Value Store
+class TimeMap {
+public:
+    unordered_map<string, vector<pair<string, int>>> m;
+    TimeMap() {}
+    void set(string key, string value, int timestamp) {
+        m[key].push_back({value, timestamp});
+    }
+    string get(string key, int timestamp) {
+        if (m.find(key) == m.end()) {
+            return "";
+        }
+        auto& v = m[key];
+        int l = 0, r = v.size() - 1;
+        while (l <= r) {
+            int m = l + (r - l) / 2;
+            if (v[m].second == timestamp) {
+                return v[m].first;
+            } else if (v[m].second < timestamp) {
+                l = m + 1;
+            } else {
+                r = m - 1;
+            }
+        }
+        return r >= 0 ? v[r].first : "";
+    }
+};
+/**
+ * Your TimeMap object will be instantiated and called as such:
+ * TimeMap* obj = new TimeMap();
+ * obj->set(key,value,timestamp);
+ * string param_2 = obj->get(key,timestamp);
+ */
 
 // 994. Rotting Oranges
 class Solution {
