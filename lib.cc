@@ -2566,6 +2566,32 @@ public:
         return m;
     }
 };
+/*
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int res = 0;
+        stack<pair<int, int>> stack;
+        for (int i = 0; i < heights.size(); i++) {
+            int h = heights[i];
+            int start = i;
+            while (!stack.empty() && stack.top().second > h) {
+                pair v = stack.top();
+                stack.pop();
+                res = max(res, v.second * (i - v.first));
+                start = v.first;
+            }
+            stack.push({start, h});
+        }
+        while (!stack.empty()) {
+            pair v = stack.top();
+            stack.pop();
+            res = max(res, v.second * ((int)heights.size() - v.first));
+        }
+        return res;
+    }
+};
+*/
 
 // 85. Maximal Rectangle
 class Solution {
@@ -6041,6 +6067,39 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> num, op;
+        long curr = 0, res = 0;
+        int sign = 1;
+        for (char c : s) {
+            if ('0' <= c && c <= '9') {
+                curr = curr * 10 + c - '0';
+            } else {
+                res += sign * curr;
+                curr = 0;
+                if (c == '+') {
+                    sign = 1;
+                } else if (c == '-') {
+                    sign = -1;
+                } else if (c == '(') {
+                    num.push(res);
+                    op.push(sign);
+                    res = 0;
+                    sign = 1;
+                } else if (c == ')') {
+                    res = res * op.top() + num.top();
+                    op.pop();
+                    num.pop();
+                }
+            }
+        }
+        return res + curr * sign;
+    }
+};
+*/
 
 // 225. Implement Stack using Queues
 class MyStack {
