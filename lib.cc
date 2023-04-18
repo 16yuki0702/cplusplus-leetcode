@@ -2007,6 +2007,28 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        string res = "";
+        int carry = 0;
+        int i = a.size() - 1, j = b.size() - 1;
+        while (0 <= i || 0 <= j) {
+            int t1 = (0 <= i) ? a[i] - '0' : 0;
+            int t2 = (0 <= j) ? b[j] - '0' : 0;
+            int total = t1 + t2 + carry;
+            res = to_string(total % 2) + res;
+            carry = total / 2;
+            i--, j--;
+        }
+        if (carry) {
+            res = "1" + res;
+        }
+        return res;
+    }
+};
+*/
 
 // 68. Text Justification
 class Solution {
@@ -5482,6 +5504,40 @@ public:
         return true;
     }
 };
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, vector<int>> m;
+        for (auto& v : prerequisites) {
+            m[v[0]].push_back(v[1]);
+        }
+        set<int> visited, finished;
+        for (auto& v : m) {
+            if (!dfs(m, visited, finished, v.first)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool dfs(unordered_map<int, vector<int>>& m, set<int>& visited, set<int>& finished, int course) {
+        if (finished.find(course) != finished.end()) {
+            return true;
+        }
+        if (visited.find(course) != visited.end()) {
+            return false;
+        }
+        visited.insert(course);
+        for (auto& pre : m[course]) {
+            if (!dfs(m, visited, finished, pre)) {
+                return false;
+            }
+        }
+        finished.insert(course);
+        return true;
+    }
+};
 */
 
 // 208. Implement Trie (Prefix Tree)
@@ -8539,6 +8595,46 @@ public:
 };
 */
 
+// 417. Pacific Atlantic Water Flow
+class Solution {
+public:
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        int row = heights.size(), col = heights[0].size();
+        vector<vector<bool>> pac(row, vector<bool>(col, false));
+        vector<vector<bool>> atl(row, vector<bool>(col, false));
+        for (int i = 0; i < col; i++) {
+            dfs(0, i, heights[0][i], pac, heights);
+            dfs(row - 1, i, heights[row - 1][i], atl, heights);
+        }
+        for (int i = 0; i < row; i++) {
+            dfs(i, 0, heights[i][0], pac, heights);
+            dfs(i, col - 1, heights[i][col - 1], atl, heights);
+        }
+        vector<vector<int>> res;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (pac[i][j] && atl[i][j]) {
+                    res.push_back({i, j});
+                }
+            }
+        }
+        return res;
+    }
+    void dfs(int r, int c, int prev, vector<vector<bool>>& visited, vector<vector<int>>& heights) {
+        if (r < 0 || heights.size() <= r || c < 0 || heights[0].size() <= c) {
+            return;
+        }
+        if (visited[r][c] || prev > heights[r][c]) {
+            return;
+        }
+        visited[r][c] = true;
+        dfs(r + 1, c, heights[r][c], visited, heights);
+        dfs(r - 1, c, heights[r][c], visited, heights);
+        dfs(r, c + 1, heights[r][c], visited, heights);
+        dfs(r, c - 1, heights[r][c], visited, heights);
+    }
+};
+
 // 419. Battleships in a Board
 class Solution {
 public:
@@ -8839,6 +8935,29 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        vector<int> count_s(26, 0), count_p(26, 0);
+        for (auto& c : p) {
+            count_p[c - 'a']++;
+        }
+        int l = 0;
+        vector<int> res;
+        for (int i = 0; i < s.size(); i++) {
+            count_s[s[i] - 'a']++;
+            if (i >= p.size()) {
+                count_s[s[l++] - 'a']--;
+            }
+            if (count_s == count_p) {
+                res.push_back(l);
+            }
+        }
+        return res;
+    }
+};
+*/
 
 // 441. Arranging Coins
 class Solution {
@@ -12258,3 +12377,25 @@ public:
     }
 };
 // https://leetcode.com/problems/longest-common-subsequence/solutions/348884/c-with-picture-o-nm/?q=C%2B%2B&orderBy=most_votes
+
+// 1235. Maximum Profit in Job Scheduling
+class Solution {
+public:
+    int jobScheduling(vector<int>& startTime, vector<int>& endTime, vector<int>& profit) {
+        map<int, int> times;
+        unordered_map<int, vector<pair<int, int>>> jobs;
+        for (int i = 0; i < startTime.size(); i++) {
+            times[startTime[i]] = 0;
+            jobs[startTime[i]].push_back({endTime[i], profit[i]});
+        }
+        int res = 0;
+        for (auto it = rbegin(times); it != rend(times); it++) {
+            for (auto job : jobs[it->first]) {
+                auto tmp = times.lower_bound(job.first);
+                res = max(res, (tmp == end(times) ? 0 : tmp->second) + job.second);
+            }
+            it->second = res;
+        }
+        return res;
+    }
+};
