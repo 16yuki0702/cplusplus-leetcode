@@ -43,6 +43,8 @@ void min_heapify(int arr[], int i, int N) {
 
 void call_max_heapify() {
   printf("max_heapify : start\n");
+
+  // first element is dummy
   int arr[] = {-1, 1, 4, 3, 7, 8, 9, 10};
   int N = sizeof(arr) / sizeof(arr[0]) - 1;
 
@@ -64,6 +66,8 @@ void call_max_heapify() {
 
 void call_min_heapify() {
   printf("min_heapify : start\n");
+
+  // first element is dummy
   int arr[] = {-1, 10, 8, 9, 7, 6, 5, 4};
   int N = sizeof(arr) / sizeof(arr[0]) - 1;
 
