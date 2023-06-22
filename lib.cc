@@ -5278,6 +5278,52 @@ public:
         check(g, i, j + 1);
     }
 };
+/*
+// Union Find approach
+class Solution {
+public:
+    unordered_map<string, string> djs;
+    int numIslands(vector<vector<char>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1') {
+                    string curr = to_string(i) + "," + to_string(j);
+                    djs[curr] = curr;
+                    if (0 <= i - 1 && grid[i - 1][j] == '1') {
+                        string up = to_string(i - 1) + "," + to_string(j);
+                        Union(curr, up);
+                    }
+                    if (0 <= j - 1 && grid[i][j - 1] == '1') {
+                        string left = to_string(i) + "," + to_string(j - 1);
+                        Union(curr, left);
+                    }
+                }
+            }
+        }
+        int count = 0;
+        for (auto &it : djs) {
+            if (it.first == it.second) {
+                count++;
+            }
+        }
+        return count;
+    }
+    string Find(string &a) {
+        if (djs[a] == a) {
+            return a;
+        }
+        return Find(djs[a]);
+    }
+    void Union(string &a, string &b) {
+        string parent = Find(a);
+        string child = Find(b);
+        if (parent != child) {
+            djs[child] = parent;
+        }
+    }
+};
+*/
 
 // 201. Bitwise AND of Numbers Range
 class Solution {
